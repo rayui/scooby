@@ -14,53 +14,20 @@ packages:
   - dnsmasq
   - bind9-utils
   - iptables
+  - iptables-persistent
+  - mailutils
 
-# Add an authorized ssh key to the pi user and lock password
+# Add an authorized ssh key to ray and lock password
 users:
-  - name: dnsmasq
-    inactive: true
-    system: true
+  - name: pi
+    lock_passwd: true
   - name: ray
     sudo: ALL=(ALL) NOPASSWD:ALL
-    lock_passwd: true
+    lock_passwd: true 
     ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuUOzRM1sPenNhmf75aU473eNoH/UGcMfJKITGCXpxayP9dGWyytjpKa1Xuu4TJXHtqqE/dpZSo6TlmoK0pmOR0bt0Knp0YslriNBRL+hRsqYcKat8vSOhUSz0otxBR3eC5x4/7jBBuwLGNM3tyQL/3pGDw9FVntJ1clqRW881F6r7qcan5VOkyviwtYldG0haIV2XoQ7GMB2AJytokj/xrSJBlNEzda4WH9MwpnO8zF2YSoHsdh+qNAzwFvvI2+34CDk3oBM/vzi48dHjVm/a3S6ymCL/zlfMKjrFUgSAqrlz8JNJwp0v43Lf2W1+vEUZAFSDil18VFZS3WkkiMbV8vHYzwVEh2u3PFmcV4IHooam7zNeSL4mGRHIM4F0+9PJ80adQsBH1UGcw+7K926b4WrJWXtolh+g2wDjSmJY/moAGLoiQXtoeBYiw9S7FeNaR+gLYfFgtq0s81C0uCBus3L5a8a4u+oth4D5e1YRHqBFGOmKt1qKwu99xpBFePawf/VFp8s4yEf+koe/oX1hdLUnYHaap/EvX2M0Tb0Y1NMEpfcLwUx1IiGlCdQ7Cu4OA0PVMYartcWi291CigxSC65lkl4iUQejtv9tqKFW+tfA9iITpKSOeyXJbhWpMOTgNygXpMiqNq4s14t+1S3A0NsEyzRei0FE4Cs3Qo5N2w== ray.userinterface@gmail.com
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKHKUWRvC+/vT8b48zgngQMO046vXfgeNpQR/lQ6QMEj ray.userinterface@gmail.com
 
 write_files:
-# Configure k3s environment file
-- path: /etc/systemd/system/k3s.service.env
-  content: |
-    K3S_TOKEN=i1F2tDzvHQsWvy5MnDsF
-    K3S_KUBECONFIG_OUTPUT=/etc/k3s/kubeconfig.yaml
-    K3S_KUBECONFIG_MODE=666
-
-# Configure a static ip address for the master
-#- path: /etc/dhcpcd.conf
-#  permissions: 0644
-#  owner: 'root:root'
-#  content: |
-#    hostname
-#    clientid
-#    persistent
-#    option rapid_commit
-#    option domain_name_servers, domain_name, domain_search, host_name
-#    option classless_static_routes
-#    option interface_mtu
-#    require dhcp_server_identifier
-#    slaac private
-#    denyinterfaces wlan0
-#    interface eth1
-#    static ip_address=192.168.64.1/24
-#    static domain_name_servers=192.168.1.2
-#    waitip 4
-#    interface eth0
-#    ipv4
-#    dhcp
-#    request 192.168.1.64
-#    persistent
-#    hostname
-#    waitip 4
-
 - path: /etc/dnsmasq.conf
   permissions: 0644
   owner: 'root:root'
@@ -83,7 +50,7 @@ write_files:
     #dhcp-ignore=tag:!known
     dhcp-host=b8:27:eb:86:53:3c,192.168.64.64,24h
 
-- path: /var/lib/iptables/rules-save
+- path: /etc/iptables/rules.v4
   permissions: 0644
   owner: 'root:root'
   content: |
@@ -102,14 +69,18 @@ write_files:
     -A POSTROUTING -o eth0 -j MASQUERADE
     COMMIT
 
-# enable ssh
-runcmd:
+bootcmd:
+  - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
   - mkdir -p /tftpboot/rpi
-  - iptables-legacy-restore < /var/lib/iptables/rules-save
+
+runcmd:
+  - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519
+  - cat /root/.ssh/id_ed25519.pub > /root/.ssh/authorized_keys
+  - systemctl restart sshd.service 
   - systemctl start dnsmasq.service
   - systemctl enable  dnsmasq.service
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - sudo install k3sup /usr/local/bin/
-  - k3sup install --ip 192.168.64.1 --user ray 
+  - k3sup install --ip 192.168.64.1 --ssh-key "/root/.ssh/id_ed25519"
   - echo "K3S JOIN KEY NODE TOKEN"
-  - sudo cat /var/lib/rancher/k3s/server/node-token
+  - cat /var/lib/rancher/k3s/server/node-token 
+  - cat /var/lib/rancher/k3s/server/node-token | mail -s 'K3S KEY' ray.userinterface@gmail.com
