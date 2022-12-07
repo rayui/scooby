@@ -72,18 +72,21 @@ write_files:
 bootcmd:
   - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
   - mkdir -p /tftpboot
-  - mkdir -p /tftpboot/willow
+  - mkdir -p /tftpboot/9686533c
   - mkdir -p /nfs/willow
-  - mkdir -p /images
+  - mkdir -p /mnt/boot
+  - mkdir -p /mnt/rootfs
 
 runcmd:
   - cp /boot/bootcode.bin /tftpboot
-  - cd /images
-  - curl -o - http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip | bsdtar -xvf-
-  - mv 2022-01-28-raspios-bullseye-arm64-lite.img willow.img
-  - mount -o loop,offset=4194304 willow.img /tftpboot/willow
-  - echo "console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,vers=3 rw ip=dhcp elevator=deadline rootwait" > /tftpboot/willow/cmdline.txt
-  - mount -o loop,offset=272629760 willow.img /nfs/willow
+  - mount -o loop,offset=4194304 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/boot
+  - rsync -xa --progress /mnt/boot/* /tftpboot/9686533c
+  - echo "console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,vers=3 rw ip=dhcp elevator=deadline rootwait cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" > /tftpboot/9686533c/cmdline.txt
+  - cp /images/agent/config/boot/* /mnt/boot
+  - umount /mnt/boot
+  - mount -o loop,offset=272629760 rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
+  - rsync -xa --progress /mnt/rootfs/* /nfs/willow
+  - umount /mnt/rootfs
   - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519
   - cat /root/.ssh/id_ed25519.pub > /root/.ssh/authorized_keys
   - systemctl restart sshd.service 

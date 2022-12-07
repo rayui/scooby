@@ -1,18 +1,28 @@
 #!/bin/bash
 AUTOMOUNTDIR=/media/ray
 IMGPATH=/home/ray/Code/scooby/images/rpi-cloud-init-raspios-bullseye-arm64.img 
+BOOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-boot
+ROOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-rootfs
 OUTDEV=/dev/mmcblk0
 
 umount ${AUTOMOUNTDIR}/* 
 dd if=${IMGPATH} of=${OUTDEV} bs=1M status=progress
-ROOTPARTSTART=$(sfdisk -l /dev/mmcblk0 | grep p2 | awk '{ print $2 }')
+ROOTPARTSTART=$(sfdisk -l ${OUTDEV} | grep p2 | awk '{ print $2 }')
 sfdisk --delete ${OUTDEV} 2
 sfdisk -a ${OUTDEV} <<EOF
 ${ROOTPARTSTART},
 EOF
-resize2fs -f ${OUTDEV}p2 7G
-mkdir -p ${AUTOMOUNTDIR}/rpi-k3s
-mount ${OUTDEV}p1 ${AUTOMOUNTDIR}/rpi-k3s
-cp ./config/server/* ${AUTOMOUNTDIR}/rpi-k3s
-sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${AUTOMOUNTDIR}/rpi-k3s/cmdline.txt
-umount ${AUTOMOUNTDIR}/rpi-k3s
+resize2fs -f ${OUTDEV}p2
+mkdir -p ${BOOTFSPATH}
+mount ${OUTDEV}p1 ${BOOTFSPATH}
+cp ./config/server/* ${BOOTFSPATH}/rpi-k3s-boot
+sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOTFSPATH}/cmdline.txt
+umount ${BOOTFSPATH}
+
+mkdir -p ${ROOTFSPATH}
+mount ${OUTDEV}p2 ${ROOTFSPATH}
+mkdir -p ${ROOTFSPATH}/images
+cp -r images/* ${ROOTFSPATH}/images
+mkdir -p ${ROOTFSPATH}/agents
+cp -r config/agents/* ${ROOTFSPATH}/agents
+umount ${ROOTFSPATH}
