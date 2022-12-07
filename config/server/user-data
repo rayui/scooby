@@ -78,20 +78,24 @@ bootcmd:
   - mkdir -p /mnt/rootfs
 
 runcmd:
+#WILLOW BOOT
   - cp /boot/bootcode.bin /tftpboot
   - mount -o loop,offset=4194304 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/boot
   - rsync -xa --progress /mnt/boot/* /tftpboot/9686533c
-  - echo "console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,vers=3 rw ip=dhcp elevator=deadline rootwait cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" > /tftpboot/9686533c/cmdline.txt
-  - cp /images/agent/config/boot/* /mnt/boot
   - umount /mnt/boot
+  - cp /agents/willow/* /tftpboot/9686533c/
+
+#WILLOW ROOTFS
   - mount -o loop,offset=272629760 rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
   - umount /mnt/rootfs
+
+#SSH
   - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519
   - cat /root/.ssh/id_ed25519.pub > /root/.ssh/authorized_keys
   - systemctl restart sshd.service 
-  - systemctl start dnsmasq.service
-  - systemctl enable  dnsmasq.service
+
+#K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   - k3sup install --ip 192.168.64.1 --ssh-key "/root/.ssh/id_ed25519"
   - echo "K3S JOIN KEY NODE TOKEN"
