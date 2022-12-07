@@ -6,8 +6,8 @@
 hostname: buffy 
 manage_etc_hosts: true
 
-package_update: true 
-package_upgrade: true
+package_update: false
+package_upgrade: false
 package_reboot_if_required: true
 
 packages:
@@ -15,7 +15,7 @@ packages:
   - bind9-utils
   - iptables
   - iptables-persistent
-  - mailutils
+  - libarchive-tools
 
 # Add an authorized ssh key to ray and lock password
 users:
@@ -45,7 +45,7 @@ write_files:
     log-queries
     log-dhcp
     enable-tftp
-    tftp-root=/tftpboot/rpi
+    tftp-root=/tftpboot/
     pxe-service=0,"Raspberry Pi Boot"
     #dhcp-ignore=tag:!known
     dhcp-host=b8:27:eb:86:53:3c,192.168.64.64,24h
@@ -71,9 +71,19 @@ write_files:
 
 bootcmd:
   - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
-  - mkdir -p /tftpboot/rpi
+  - mkdir -p /tftpboot
+  - mkdir -p /tftpboot/willow
+  - mkdir -p /nfs/willow
+  - mkdir -p /images
 
 runcmd:
+  - cp /boot/bootcode.bin /tftpboot
+  - cd /images
+  - curl -o - http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip | tar -xvf-
+  - mv 2022-01-28-raspios-bullseye-arm64-lite.img willow.img
+  - mount -o loop,offset=4194304 willow.img /tftpboot/willow
+  - echo "console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,vers=3 rw ip=dhcp elevator=deadline rootwait" > /tftpboot/willow/cmdline.txt
+  - mount -o loop,offset=272629760 willow.img /nfs/willow
   - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519
   - cat /root/.ssh/id_ed25519.pub > /root/.ssh/authorized_keys
   - systemctl restart sshd.service 
@@ -83,4 +93,3 @@ runcmd:
   - k3sup install --ip 192.168.64.1 --ssh-key "/root/.ssh/id_ed25519"
   - echo "K3S JOIN KEY NODE TOKEN"
   - cat /var/lib/rancher/k3s/server/node-token 
-  - cat /var/lib/rancher/k3s/server/node-token | mail -s 'K3S KEY' ray.userinterface@gmail.com
