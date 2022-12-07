@@ -79,7 +79,7 @@ bootcmd:
 runcmd:
   - cp /boot/bootcode.bin /tftpboot
   - cd /images
-  - curl -o - http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip | tar -xvf-
+  - curl -o - http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip | bsdtar -xvf-
   - mv 2022-01-28-raspios-bullseye-arm64-lite.img willow.img
   - mount -o loop,offset=4194304 willow.img /tftpboot/willow
   - echo "console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,vers=3 rw ip=dhcp elevator=deadline rootwait" > /tftpboot/willow/cmdline.txt
