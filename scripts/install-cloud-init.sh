@@ -33,11 +33,12 @@ cat - > /etc/cloud/cloud.cfg.d/99_raspbian.cfg <<'EOF'
 system_info:
   default_user:
     name: ray 
-    lock_passwd: false
-    gecos: Raspbian
-    groups: [ray adm dialout cdrom sudo audio video plugdev games users input netdev spi i2c gpio]
+    lock_passwd: true 
+    groups: [adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio]
     sudo: ["ALL=(ALL) NOPASSWD: ALL"]
     shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKHKUWRvC+/vT8b48zgngQMO046vXfgeNpQR/lQ6QMEj ray.userinterface@gmail.com
   package_mirrors:
     - arches: [default]
       failsafe:
