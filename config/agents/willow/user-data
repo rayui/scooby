@@ -11,6 +11,9 @@ package_upgrade: false
 package_reboot_if_required: true
 
 # Add an authorized ssh key to ray and lock password
+groups:
+  - ray
+
 users:
   - name: pi
     lock_passwd: true
