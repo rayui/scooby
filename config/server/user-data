@@ -96,8 +96,8 @@ runcmd:
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
   - sleep 5
-  - rm /nfs/willow/boot
-  - ln -s /tftpboot/9686533c/ /nfs/willow/boot
+  - rm -rf /nfs/willow/boot
+  - ln -s /tftpboot/9686533c /nfs/willow/boot
   - cp /agents/willow/fstab /nfs/willow/etc
   - umount /mnt/rootfs
   - sleep 5
