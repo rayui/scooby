@@ -11,11 +11,13 @@ package_upgrade: false
 package_reboot_if_required: true
 
 packages:
+  - vim
   - dnsmasq
   - bind9-utils
   - iptables
   - iptables-persistent
   - libarchive-tools
+  - nfs-server
 
 # Add an authorized ssh key to ray and lock password
 users:
@@ -86,7 +88,7 @@ runcmd:
   - cp /agents/willow/* /tftpboot/9686533c/
 
 #WILLOW ROOTFS
-  - mount -o loop,offset=272629760 rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
+  - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
   - umount /mnt/rootfs
 

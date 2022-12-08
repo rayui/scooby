@@ -1,1 +1,1 @@
-dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,udp,nfsvers=3,rsize=32768,wsize=32768,hard,intr rw ip=dhcp rootwait elevator=deadline cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 ip=dhcp root=/dev/nfs nfsroot=192.168.64.1:/nfs/willow,tcp,vers=3 rw elevator=deadline rootwait cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory

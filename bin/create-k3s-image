@@ -3,27 +3,38 @@ AUTOMOUNTDIR=/media/ray
 IMGPATH=/home/ray/Code/scooby/images/rpi-cloud-init-raspios-bullseye-arm64.img 
 BOOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-boot
 ROOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-rootfs
-OUTDEV=/dev/mmcblk0
+OUTDEV=$1
 
-umount ${AUTOMOUNTDIR}/* 
+if [[ ! ${OUTDEV} ]]; then
+	echo "First argument must be device path"
+	exit 1
+fi
+
+#COPY IMAGE TO OUTPUT DEVICE 
 dd if=${IMGPATH} of=${OUTDEV} bs=1M status=progress
-ROOTPARTSTART=$(sfdisk -l ${OUTDEV} | grep p2 | awk '{ print $2 }')
+
+#RESIZE ROOTFS PARTITION
+ROOTPARTSTART=$(sfdisk -l ${OUTDEV} | grep ${OUTDEV}2 | awk '{ print $2 }')
 sfdisk --delete ${OUTDEV} 2
 sfdisk -a ${OUTDEV} <<EOF
 ${ROOTPARTSTART},
 EOF
-resize2fs -f ${OUTDEV}p2
+resize2fs -f ${OUTDEV}2 20G
 
+#COPY BOOT FILES
 mkdir -p ${BOOTFSPATH}
-mount ${OUTDEV}p1 ${BOOTFSPATH}
+umount ${BOOTFSPATH}
+mount ${OUTDEV}1 ${BOOTFSPATH}
 cp ./config/server/* ${BOOTFSPATH}
 sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOTFSPATH}/cmdline.txt
 umount ${BOOTFSPATH}
 
+#COPY AGENT IMAGE AND CONFIG
 mkdir -p ${ROOTFSPATH}
-mount ${OUTDEV}p2 ${ROOTFSPATH}
+umount ${ROOTFSPATH}
+mount ${OUTDEV}2 ${ROOTFSPATH}
 mkdir -p ${ROOTFSPATH}/images
-cp -r images/* ${ROOTFSPATH}/images
+cp -r ${IMGPATH} ${ROOTFSPATH}/images
 mkdir -p ${ROOTFSPATH}/agents
 cp -r config/agents/* ${ROOTFSPATH}/agents
 umount ${ROOTFSPATH}
