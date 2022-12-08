@@ -18,14 +18,6 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKHKUWRvC+/vT8b48zgngQMO046vXfgeNpQR/lQ6QMEj ray.userinterface@gmail.com
 
-write-files:
-  - path: /etc/fstab
-    owner: 'root:root'
-    mode: 0600
-    content: |
-	proc			        /proc   proc    defaults        0	0
-	192.168.64.1:/nfs/willow	/	nfs	defaults	0	0
-
 runcmd:
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --ssh-key "/home/ray/.ssh/id_ed25519"
