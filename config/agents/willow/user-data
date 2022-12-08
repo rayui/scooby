@@ -12,12 +12,16 @@ package_reboot_if_required: true
 
 # Add an authorized ssh key to ray and lock password
 users:
+  - name: pi
+    lock_passwd: true
   - name: ray
     sudo: ALL=(ALL) NOPASSWD:ALL
-    lock_passwd: true 
+    lock_passwd: true
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKHKUWRvC+/vT8b48zgngQMO046vXfgeNpQR/lQ6QMEj ray.userinterface@gmail.com
 
 runcmd:
+  - systemctl enable sshd.service
+  - systemctl restart sshd.service 
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --ssh-key "/home/ray/.ssh/id_ed25519"
