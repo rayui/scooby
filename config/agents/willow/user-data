@@ -23,8 +23,8 @@ write-files:
     owner: 'root:root'
     mode: 0600
     content: |
-	proc            /proc           proc    defaults          0       0
-	192.168.64.1:/nfs/willow	/	nfs	defaults
+	proc			        /proc   proc    defaults        0	0
+	192.168.64.1:/nfs/willow	/	nfs	defaults	0	0
 
 runcmd:
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh

@@ -50,7 +50,8 @@ write_files:
     tftp-root=/tftpboot/
     pxe-service=0,"Raspberry Pi Boot"
     #dhcp-ignore=tag:!known
-    dhcp-host=b8:27:eb:86:53:3c,192.168.64.64,24h
+    dhcp-host=net:willow,b8:27:eb:86:53:3c,willow,192.168.64.64,24h
+    dhcp-option=net:willow,17,192.168.64.1:/nfs/willow
 
 - path: /etc/iptables/rules.v4
   permissions: 0644
@@ -70,6 +71,12 @@ write_files:
     :POSTROUTING ACCEPT [96483:5789063]
     -A POSTROUTING -o eth0 -j MASQUERADE
     COMMIT
+
+- path: /etc/exports
+  permissions: 0644
+  owner: 'root:root'
+  content: |
+    /nfs/willow		192.168.64.64(rw,sync,no_subtree_check,no_root_squash)
 
 bootcmd:
   - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
