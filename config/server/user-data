@@ -18,6 +18,7 @@ packages:
   - iptables-persistent
   - libarchive-tools
   - nfs-server
+  - golang
 
 users:
   - default
@@ -79,6 +80,11 @@ bootcmd:
   - mkdir -p /mnt/rootfs
 
 runcmd:
+#PATH
+  - echo "export GOBIN=/usr/local/bin" >> /etc/profile
+  - echo "export PATH=$PATH:$GOBIN" >> /etc/profile
+  - source /etc/profile
+
 #WILLOW ROOTFS
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
@@ -92,11 +98,17 @@ runcmd:
   - rsync -xa --progress /mnt/boot/* /nfs/willow/boot
   - umount /mnt/boot
   - sleep 5
-  - cp /agents/willow/user-data.txt /nfs/willow/boot
-  - cp /agents/willow/network-config.txt /nfs/willow/boot 
+  - cp /agents/willow/user-data /nfs/willow/boot
+  - cp /agents/willow/meta-data /nfs/willow/boot 
+  - cp /agents/willow/network-config /nfs/willow/boot 
   - cp /agents/willow/cmdline.txt /nfs/willow/boot 
-  - cp /agents/willow/ssh /nfs/willow/boot 
+  - cp /agents/willow/ssh /nfs/willow/boot
   - ln -s /nfs/willow/boot /tftpboot/9686533c
+
+#USER-DATA SERVER
+  - go install github.com/rif/spark@latest
+  - spark -address 192.168.64.1 -port 8081 -path "/user-data" /nfs/willow/boot/user-data &
+  - spark -address 192.168.64.1 -port 8081 -path "/meta-data" /nfs/willow/boot/meta-data &
 
 #SSH
   - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519

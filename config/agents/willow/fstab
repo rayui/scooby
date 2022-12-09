@@ -1,3 +1,2 @@
 proc			        /proc   proc    defaults        0	0
 192.168.64.1:/nfs/willow	/	nfs	defaults	0	0
-192.168.64.1:/nfs/willow/boot	/boot	nfs	defaults	0	0
