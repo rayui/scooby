@@ -19,6 +19,7 @@ packages:
   - libarchive-tools
   - nfs-server
   - golang
+  - git
 
 users:
   - default
@@ -72,19 +73,22 @@ write_files:
   content: |
     /nfs/willow		192.168.64.64(rw,sync,no_subtree_check,no_root_squash)
 
+- path: /etc/profile.d/go.sh
+  permissions: 0755
+  owner: 'root:root'
+  content: |
+    export GOPATH=/usr/local/go
+    export PATH=$PATH:/usr/local/go/bin
+
 bootcmd:
   - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
   - mkdir -p /tftpboot
   - mkdir -p /nfs/willow
   - mkdir -p /mnt/boot
   - mkdir -p /mnt/rootfs
+  - mkdir -p /usr/local/go
 
 runcmd:
-#PATH
-  - echo "export GOBIN=/usr/local/bin" >> /etc/profile
-  - echo "export PATH=$PATH:$GOBIN" >> /etc/profile
-  - source /etc/profile
-
 #WILLOW ROOTFS
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
@@ -106,9 +110,9 @@ runcmd:
   - ln -s /nfs/willow/boot /tftpboot/9686533c
 
 #USER-DATA SERVER
-  - go install github.com/rif/spark@latest
-  - spark -address 192.168.64.1 -port 8081 -path "/user-data" /nfs/willow/boot/user-data &
-  - spark -address 192.168.64.1 -port 8081 -path "/meta-data" /nfs/willow/boot/meta-data &
+  - go get github.com/rif/spark
+  - go install github.com/rif/spark
+  - /usr/local/go/bin/spark -address 192.168.64.1 -port 8081 -path "/" /nfs/willow/boot/ &
 
 #SSH
   - ssh-keygen -q -f /root/.ssh/id_ed25519 -N "" -t ed25519

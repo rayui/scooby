@@ -21,7 +21,7 @@ deb {{mirror}} {{codename}} main contrib non-free rpi
 deb-src {{mirror}} {{codename}} main contrib non-free rpi
 EOF
 
-cat -> /etc/cloud/cloud.cfg.d/99_fake_cloud.cfg <<'EOF'
+cat - > /etc/cloud/cloud.cfg.d/99_fake_cloud.cfg <<'EOF'
 # configure cloud-init for NoCloud
 datasource_list: [ NoCloud, None ]
 datasource:
