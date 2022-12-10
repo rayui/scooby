@@ -15,4 +15,4 @@ users:
 
 runcmd:
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --ssh-key "/home/ray/.ssh/id_ed25519"
+  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --ssh-key "/home/spike/.ssh/id_ed25519"
