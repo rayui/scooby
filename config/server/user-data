@@ -126,7 +126,7 @@ runcmd:
 
 #WILLOW SSH KEYS
   - mkdir -p /nfs/willow/home/spike/.ssh
-  - ssh-keygen -q -f /nfs/willow/home/spike/.ssh/id_ed25519 -N "" -t ed25519
+  - cp /home/spike/.ssh/id_ed25519 /nfs/willow/home/spike/.ssh/
   - cat /nfs/willow/home/spike/.ssh/id_ed25519.pub >> /home/spike/.ssh/authorized_keys
   - cat /home/spike/.ssh/id_ed25519.pub >> /nfs/willow/home/spike/.ssh/authorized_keys
   - chown -R spike:spike /nfs/willow/home/spike/
