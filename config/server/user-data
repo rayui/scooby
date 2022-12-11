@@ -103,7 +103,9 @@ runcmd:
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
   - cp /agents/willow/fstab /nfs/willow/etc
+  #local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
   - umount /mnt/rootfs
+  - mkdir -p /nfs/willow/var/lib/rancher
   - sleep 5
 
 #WILLOW BOOT
