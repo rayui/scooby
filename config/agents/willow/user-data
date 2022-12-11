@@ -14,6 +14,6 @@ users:
   - default
 
 runcmd:
-  - cat /etc/ssh/buffy_ed25519_key.pub >> /home/spike/.ssh/authorized_hosts
+  - cat /etc/ssh/buffy_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/etc/ssh/buffy_ed25519_key"
