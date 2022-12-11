@@ -97,8 +97,7 @@ runcmd:
   - cp /boot/bootcode.bin /tftpboot
 
 #SSH KEYS
-  - ssh-keygen -q -f /home/spike/.ssh/id_ed25519 -N "" -t ed25519
-  - cat /home/spike/.ssh/id_ed25519.pub > /home/spike/.ssh/authorized_keys
+  - cat /etc/ssh/ssh_host_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
 
 #WILLOW ROOTFS
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
@@ -124,16 +123,12 @@ runcmd:
   - ln -s /nfs/willow/boot/user-data /var/www/html/cloud-config/willow
   - ln -s /nfs/willow/boot/meta-data /var/www/html/cloud-config/willow
 
-#WILLOW SSH KEYS
-  - mkdir -p /nfs/willow/home/spike/.ssh
-  - cp /home/spike/.ssh/id_ed25519 /nfs/willow/home/spike/.ssh/
-  - cat /nfs/willow/home/spike/.ssh/id_ed25519.pub >> /home/spike/.ssh/authorized_keys
-  - cat /home/spike/.ssh/id_ed25519.pub >> /nfs/willow/home/spike/.ssh/authorized_keys
-  - chown -R spike:spike /nfs/willow/home/spike/
-  - chown -R spike:spike /home/spike/
+#WILLOW USER
+  - cp /etc/ssh/ssh_host_ed25519_key /nfs/willow/etc/ssh/buffy_ed25519_key
+  - cp /etc/ssh/ssh_host_ed25519_key.pub /nfs/willow/etc/ssh/buffy_ed25519_key.pub
 
 #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup install --ip 192.168.64.1 --user spike --ssh-key "/home/spike/.ssh/id_ed25519"
+  - k3sup install --ip 192.168.64.1 --user spike --ssh-key "/etc/ssh/ssh_host_ed25519_key"
   - echo "K3S JOIN KEY NODE TOKEN"
   - cat /var/lib/rancher/k3s/server/node-token 
