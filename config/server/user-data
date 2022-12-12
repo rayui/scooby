@@ -4,7 +4,7 @@
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
 hostname: buffy 
-manage_etc_hosts: true
+manage_etc_hosts: false 
 
 package_update: false
 package_upgrade: false
@@ -24,19 +24,41 @@ users:
   - default
 
 write_files:
+- path: /etc/hosts
+  permissions: 0644
+  owner: 'root:root'
+  content: |
+    127.0.1.1 buffy buffy
+    127.0.0.1 localhost
+    ::1 ip6-localhost ip6-loopback
+    fe00::0 ip6-localnet
+    ff00::0 ip6-mcastprefix
+    ff02::1 ip6-allnodes
+    ff02::2 ip6-allrouters
+    ff02::3 ip6-allhosts
+
+    192.168.64.1 buffy
+    192.168.64.1 buffy.scooby
+    192.168.64.1 buffy.scooby.eastwood
+    192.168.64.64 willow
+    192.168.64.64 willow.scooby
+    192.168.64.64 willow.scooby.eastwood
+
 - path: /etc/dnsmasq.conf
   permissions: 0644
   owner: 'root:root'
   content: |
     listen-address=::1,127.0.0.1,192.168.64.1
-    port=0
+    port=53
+    domain=scooby.eastwood
     interface=eth1
     bind-interfaces
     dhcp-authoritative
     dhcp-range=interface:eth1,192.168.64.64,192.168.64.191
     dhcp-option=66,192.168.64.1
     dhcp-option=option:router,192.168.64.1
-    server=192.168.64.1
+    server=192.168.1.2
+    server=1.1.1.1
     expand-hosts
     log-queries
     log-dhcp
@@ -70,7 +92,7 @@ write_files:
   permissions: 0644
   owner: 'root:root'
   content: |
-    /nfs/willow		192.168.64.64(rw,sync,no_subtree_check,no_root_squash)
+    /nfs/willow		willow(rw,sync,no_subtree_check,no_root_squash)
 
 - path: /etc/lighttpd/lighttpd.conf
   permissions: 0644
@@ -86,29 +108,31 @@ write_files:
     server.groupname            = "www-data"
 
 bootcmd:
-  - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
+  #this must be here for dnsmasq startup
   - mkdir -p /tftpboot
+  #this must be here for nfs-kernel-server startup
   - mkdir -p /nfs/willow
-  - mkdir -p /mnt/boot
-  - mkdir -p /mnt/rootfs
+  - sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
 
 runcmd:
+#SSH KEYS
+  - ssh-keygen -q -f /home/spike/.ssh/id_ed25519 -N "" -t ed25519
+  - cat /home/spike/.ssh/id_ed25519.pub >> /home/spike/.ssh/authorized_keys
+  - chown -R spike:spike /home/spike/.ssh/
+
 #SETUP TFTPBOOT
   - cp /boot/bootcode.bin /tftpboot
 
-#SSH KEYS
-  - cat /etc/ssh/ssh_host_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
-
 #WILLOW ROOTFS
+  - mkdir -p /mnt/rootfs
   - mount -o loop,offset=272629760 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/rootfs
   - rsync -xa --progress /mnt/rootfs/* /nfs/willow
   - cp /agents/willow/fstab /nfs/willow/etc
-  #local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
   - umount /mnt/rootfs
-  - mkdir -p /nfs/willow/var/lib/rancher
   - sleep 5
 
 #WILLOW BOOT
+  - mkdir -p /mnt/boot
   - mount -o loop,offset=4194304 /images/rpi-cloud-init-raspios-bullseye-arm64.img /mnt/boot
   - rsync -xa --progress /mnt/boot/* /nfs/willow/boot
   - umount /mnt/boot
@@ -126,11 +150,15 @@ runcmd:
   - ln -s /nfs/willow/boot/meta-data /var/www/html/cloud-config/willow
 
 #WILLOW USER
-  - cp /etc/ssh/ssh_host_ed25519_key /nfs/willow/etc/ssh/buffy_ed25519_key
-  - cp /etc/ssh/ssh_host_ed25519_key.pub /nfs/willow/etc/ssh/buffy_ed25519_key.pub
+  - cp /home/spike/.ssh/id_ed25519 /nfs/willow/etc/ssh/spike_ed25519_key
+  - cp /home/spike/.ssh/id_ed25519.pub /nfs/willow/etc/ssh/spike_ed25519_key.pub
 
 #K3S
+    #local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
+  - mkdir -p /nfs/willow/var/lib/rancher
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup install --ip 192.168.64.1 --user spike --ssh-key "/etc/ssh/ssh_host_ed25519_key"
+  - k3sup install --ip buffy --user spike --ssh-key "/home/spike/.ssh/id_ed25519"
   - echo "K3S JOIN KEY NODE TOKEN"
-  - cat /var/lib/rancher/k3s/server/node-token 
+  - cat /var/lib/rancher/k3s/server/node-token
+
+  - wall "BUFFY WILL PATROL TONIGHT" 
