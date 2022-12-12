@@ -3,7 +3,7 @@
 #
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: willow 
+hostname: willow
 manage_etc_hosts: true
 
 package_update: false 
@@ -17,9 +17,7 @@ runcmd:
   - cp /etc/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
   - cp /etc/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
   - cat /etc/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
-  - chown -R spike:spike /home/spike/.ssh/* 
-  
+  - chown -R spike:spike /home/spike/.ssh/*
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup join --ip willow --server-ip buffy --user spike --server-user spike --ssh-key "/home/spike/.ssh/id_ed25519"
-
+  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/home/spike/.ssh/id_ed25519"
   - wall "WILLOW IS ONLINE BEEP BOOP"
