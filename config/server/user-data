@@ -157,7 +157,8 @@ runcmd:
     #local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
   - mkdir -p /nfs/willow/var/lib/rancher
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup install --ip 192.168.64.1 --user spike --ssh-key "/home/spike/.ssh/id_ed25519"
+  # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327 
+  - k3sup install --ip 192.168.64.1 --user spike --ssh-key "/home/spike/.ssh/id_ed25519" --k3s-extra-args "--flannel-backend=host-gw"
   - echo "K3S JOIN KEY NODE TOKEN"
   - cat /var/lib/rancher/k3s/server/node-token
 
