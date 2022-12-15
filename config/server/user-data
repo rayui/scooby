@@ -419,7 +419,7 @@ runcmd:
   - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 #NGINX INGRESS
-  - helm install --kubeconfig /home/spike/.config/kube-config.yaml --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace 
+  - helm install --kubeconfig /home/spike/.config/kube-config.yaml ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace 
 
 #PROMETHEUS
   - kubectl create ns prom
