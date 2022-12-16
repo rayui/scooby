@@ -102,7 +102,7 @@ write_files:
   owner: 'root:root'
   content: |
     server.bind 		= "192.168.64.1"
-    server.port 		= 98087
+    server.port 		= 58087
     server.document-root        = "/var/www/html"
     server.upload-dirs          = ( "/var/cache/lighttpd/uploads" )
     server.errorlog             = "/var/log/lighttpd/error.log"
@@ -162,11 +162,11 @@ write_files:
   owner: 'root:root'
   content: |
     apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: ingress-nginx
-        labels:
-          name: traffic
+    kind: Namespace
+    metadata:
+      name: ingress-nginx
+      labels:
+        name: traffic
     ---
     apiVersion: helm.cattle.io/v1
     kind: HelmChart
