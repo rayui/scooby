@@ -13,11 +13,12 @@ package_reboot_if_required: true
 users:
   - default
 
+bootcmd:
+  -   # local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
+  - mkdir -p /var/lib/rancher
+
 runcmd:
-  - cp /etc/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
-  - cp /etc/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
-  - cat /etc/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
-  - chown -R spike:spike /home/spike/.ssh/*
+  - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/home/spike/.ssh/id_ed25519"
+  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/var/lib/scooby/ssh/spike_ed25519"
   - wall "WILLOW IS ONLINE BEEP BOOP"
