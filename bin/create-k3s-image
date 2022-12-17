@@ -1,6 +1,7 @@
 #!/bin/bash
 AUTOMOUNTDIR=/media/ray
-IMGPATH=/home/ray/Code/scooby/images/rpi-cloud-init-raspios-bullseye-arm64.img 
+IMGPATH=/home/ray/Code/scooby/images/rpi-cloud-init-raspios-bullseye-arm64.img
+IMGMOUNT=${AUTMOUNTDIR}/rpi-mount
 BOOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-boot
 ROOTFSPATH=${AUTMOUNTDIR}/rpi-k3s-rootfs
 OUTDEV=$1
@@ -21,20 +22,33 @@ ${ROOTPARTSTART},
 EOF
 resize2fs -f ${OUTDEV}2 20G
 
-#COPY BOOT FILES
+#COPY BOOT FILES TO SERVER INSALL
 mkdir -p ${BOOTFSPATH}
-umount ${BOOTFSPATH}
-mount ${OUTDEV}1 ${BOOTFSPATH}
-cp ./config/server/* ${BOOTFSPATH}
-sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOTFSPATH}/cmdline.txt
-umount ${BOOTFSPATH}
-
-#COPY AGENT IMAGE AND CONFIG
 mkdir -p ${ROOTFSPATH}
+umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}
+mount ${OUTDEV}1 ${BOOTFSPATH}
 mount ${OUTDEV}2 ${ROOTFSPATH}
-mkdir -p ${ROOTFSPATH}/images
-cp -r ${IMGPATH} ${ROOTFSPATH}/images
-mkdir -p ${ROOTFSPATH}/agents
-cp -r config/agents/* ${ROOTFSPATH}/agents
+
+cp -r ./config/server/boot/* ${BOOTFSPATH}
+cp -r ./config/server/* ${ROOTFSPATH}
+sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOTFSPATH}/cmdline.txt
+
+#UNPACK WILLOW INSTALL FROM IMAGE
+
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/
+mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
+umount ${IMGMOUNT}
+
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/boot/
+mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/boot/
+umount ${IMGMOUNT}
+
+#CONFIGURE WILLOW IMAGE
+
+cp -r ./config/agents/willow/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
+
+umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}

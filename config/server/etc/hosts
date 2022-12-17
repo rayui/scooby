@@ -1,0 +1,17 @@
+127.0.1.1 buffy buffy
+127.0.0.1 localhost
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+
+192.168.1.64 prometheus.buffy
+192.168.1.64 grafana.buffy
+192.168.64.1 buffy
+192.168.64.1 buffy.scooby
+192.168.64.1 buffy.scooby.eastwood
+192.168.64.64 willow
+192.168.64.64 willow.scooby
+192.168.64.64 willow.scooby.eastwood
