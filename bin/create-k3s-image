@@ -25,6 +25,7 @@ resize2fs -f ${OUTDEV}2 20G
 #COPY BOOT FILES TO SERVER INSALL
 mkdir -p ${BOOTFSPATH}
 mkdir -p ${ROOTFSPATH}
+mkdir -p ${IMGMOUNT}
 umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}
 mount ${OUTDEV}1 ${BOOTFSPATH}
@@ -38,7 +39,7 @@ sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOT
 
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/
 mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
-rsync -xa --progress ${IMGMOUNT}* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
 umount ${IMGMOUNT}
 
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/boot/
