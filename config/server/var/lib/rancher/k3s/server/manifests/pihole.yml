@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pihole
+  labels:
+    name: traffic
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  chart: pihole
+  targetNamespace: pihole
+  repo: https://mojo2600.github.io/pihole-kubernetes/
+  valuesContent: |-
+    hostname: "resolv2"
+    virtualHost: "resolv.buffy"
+    serviceWeb:
+      loadBalancerIP: 192.168.1.64
+      type: LoadBalancer
+    serviceTCP:
+      loadBalancerIP: 192.168.1.64
+      type: LoadBalancer
+    serviceUDP:
+      loadBalancerIP: 192.168.1.64
+      type: LoadBalancer
+    serviceDhcp:
+      loadBalancerIP: 192.168.1.64
+      type: LoadBalancer
+
+    podDnsConfig:
+      enabled: true
+      policy: "None"
+      nameservers:
+      - 1.1.1.1
+      - 8.8.8.8
+    dnsmasq
+      staticDhcpEntries: 
+      - dhcp-host=30:FD:38:82:76:43,192.168.1.7,chromecast-bedroom
+      - dhcp-host=30:05:5C:8E:ED:C3,192.168.1.10,brother
+      - dhcp-host=44:07:0B:B8:11:B1,192.168.1.5,chromecast-lounge
+      - dhcp-host=C0:3F:0E:F1:65:62,192.168.1.254,netgear-sw-0
+      - dhcp-host=6C:DF:FB:0C:DD:88,192.168.1.6,hdmi
+      - dhcp-host=00:90:E8:0A:43:05,192.168.1.4,serial
+      - dhcp-host=B8:27:EB:81:1A:52,192.168.1.2,resolv
+      - dhcp-host=08:00:20:AA:BB:CC,192.168.1.11,snail
+      - dhcp-host=00:14:4F:4A:B6:D4,192.168.1.13,sol
+      - dhcp-host=00:17:F2:05:9E:CE,192.168.1.12,media
+      - dhcp-host=74:AC:B9:B3:DC:E9,192.168.1.253,unifi-0
+      - dhcp-host=68:D7:9A:16:9E:DE,192.168.1.252,unifi-1
+      - dhcp-host=08:00:20:C0:FF:33,192.168.1.14,slug
+      - dhcp-host=C8:4D:44:23:00:B5,192.168.1.15,raybot
+      - dhcp-host=C0:3F:0E:38:15:89,192.168.1.251,netgear-sw-1
+      - dhcp-host=DC:A6:32:9F:79:BA,192.168.1.64,buffy

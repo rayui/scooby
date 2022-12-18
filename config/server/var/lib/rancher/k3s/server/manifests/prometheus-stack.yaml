@@ -62,12 +62,12 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-        hosts: ['alertmanager.buffy']
+        hosts: ['alerts.buffy']
         paths: ['/']
         tls:
         - secretName: tls-credential
           hosts:
-          - alertmanager.buffy
+          - alerts.buffy
 
       alertmanagerSpec:
         storage:
@@ -78,7 +78,7 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
-        externalUrl: https://alertmanager.buffy/
+        externalUrl: https://alerts.buffy/
         routePrefix: /
 
       tplConfig: false
