@@ -1,8 +1,8 @@
 kube-controller-manager-arg:
-- "bind-address=0.0.0.0"
+- "bind-address=192.168.64.1"
 kube-proxy-arg:
-- "metrics-bind-address=0.0.0.0"
+- "metrics-bind-address=192.168.64.1"
 kube-scheduler-arg:
-- "bind-address=0.0.0.0"
+- "bind-address=192.168.64.1"
 # Controller Manager exposes etcd sqllite metrics
 etcd-expose-metrics: true
