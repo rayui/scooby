@@ -37,7 +37,14 @@ spec:
       annotations:
         kubernetes.io/ingress.class: nginx
       type: LoadBalancer
-      loadBalancerIP: 192.168.1.64 
+      loadBalancerIP: 192.168.1.64
+    dnsmasq:
+      customDnsEntries:
+      - address=/buffy/192.168.1.64
+      - address=/resolv.buffy/192.168.1.64
+      - address=/prometheus.buffy/192.168.1.64
+      - address=/grafana.buffy/192.168.1.64
+      - address=/alertmanager.buffy/192.168.1.64
     podDnsConfig:
       enabled: false
       policy: "None"
