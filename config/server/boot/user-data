@@ -28,12 +28,12 @@ users:
 bootcmd:
   #this must be here for dnsmasq startup
   - mkdir -p /tftpboot
-  #install directory
-  - mkdir -p /var/lib/scooby
-  #this must be here for nfs-kernel-server startup
-  - mkdir -p /var/lib/scooby/agents/willow
+  #install directory and nfs folders. this must be here for nfs-kernel-server startup
+  - mkdir -p /var/lib/scooby/agents/
   #willow install directory
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby
+  #xander install directory
+  - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
 
 runcmd:
 #CREATE CONFIG DIRS
@@ -46,6 +46,8 @@ runcmd:
 
 #SETUP TFTPBOOT
   - cp /boot/bootcode.bin /tftpboot
+
+#SETUP WILLOW TFTPBOOT
   - ln -s /var/lib/scooby/agents/willow/boot /tftpboot/9686533c
 
 #WILLOW CLOUD CONFIG 
@@ -57,6 +59,19 @@ runcmd:
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby/ssh/
   - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key
   - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key.pub
+
+#SETUP XANDER TFTPBOOT
+  - ln -s /var/lib/scooby/agents/xander/boot /tftpboot/c6811a52
+
+#XANDER CLOUD CONFIG 
+  - mkdir -p /var/www/html/cloud-config/xander
+  - ln -s /var/lib/scooby/agents/xander/boot/user-data /var/www/html/cloud-config/xander
+  - ln -s /var/lib/scooby/agents/xander/boot/meta-data /var/www/html/cloud-config/xander
+
+#XANDER KEYS
+  - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby/ssh/
+  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key
+  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key.pub
 
 #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh

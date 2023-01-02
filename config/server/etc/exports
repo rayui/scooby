@@ -1,1 +1,2 @@
 /var/lib/scooby/agents/willow		willow(rw,sync,no_subtree_check,no_root_squash)
+/var/lib/scooby/agents/xander		xander(rw,sync,no_subtree_check,no_root_squash)

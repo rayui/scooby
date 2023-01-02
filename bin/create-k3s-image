@@ -51,5 +51,21 @@ umount ${IMGMOUNT}
 
 cp -r ./config/agents/willow/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
 
+#UNPACK XANDER INSTALL FROM IMAGE
+
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/xander/
+mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/
+umount ${IMGMOUNT}
+
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/xander/boot/
+mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/boot/
+umount ${IMGMOUNT}
+
+#CONFIGURE XANDER IMAGE
+
+cp -r ./config/agents/xander/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/
+
 umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}

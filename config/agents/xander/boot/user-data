@@ -3,7 +3,7 @@
 #
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: willow
+hostname: xander
 manage_etc_hosts: true
 
 package_update: false 
@@ -22,5 +22,5 @@ runcmd:
   - cp /var/lib/scooby/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
   - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup join --ip 192.168.64.64 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key"
-  - wall "WILLOW IS ONLINE BEEP BOOP"
+  - k3sup join --ip 192.168.64.65 --server-ip 192.168.64.1 --user spike --server-user spike --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key"
+  - wall "XANDER IS ONLINE BEEP BOOP"
