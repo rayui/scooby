@@ -23,8 +23,6 @@ spec:
     containerPort:
       http: 80
       https: 443
-      domain: 53
-      bootps: 67
     sidecar:
       datasources:
         enabled: true

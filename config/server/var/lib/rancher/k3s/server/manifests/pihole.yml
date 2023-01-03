@@ -45,6 +45,7 @@ spec:
       - address=/prometheus.buffy/192.168.1.64
       - address=/grafana.buffy/192.168.1.64
       - address=/alertmanager.buffy/192.168.1.64
+      - address=/minecraft.buffy/192.168.1.64
     podDnsConfig:
       enabled: false
       policy: "None"

@@ -30,6 +30,7 @@ bootcmd:
   - mkdir -p /tftpboot
   #install directory and nfs folders. this must be here for nfs-kernel-server startup
   - mkdir -p /var/lib/scooby/agents/
+  - mkdir -p /var/lib/minecraft-data/
   #willow install directory
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby
   #xander install directory
@@ -76,7 +77,7 @@ runcmd:
 #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327 
-  - k3sup install --ip 192.168.1.64 --user spike --ssh-key "/home/spike/.ssh/id_ed25519" --k3s-extra-args "--flannel-backend=host-gw --disable traefik"
+  - k3sup install --ip 192.168.1.64 --user spike --ssh-key "/home/spike/.ssh/id_ed25519" --k3s-extra-args "--flannel-backend=host-gw --disable traefik --kube-apiserver-arg service-node-port-range=1000-32767"
   - cp /tmp/kubeconfig /root/.kube/config
 
 #READY

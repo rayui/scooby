@@ -12,6 +12,7 @@ ff02::3 ip6-allhosts
 192.168.1.64 grafana.buffy
 192.168.1.64 alerts.buffy
 192.168.1.64 resolv.buffy
+192.168.1.64 minecraft.buffy
 
 192.168.64.1 buffy.scooby
 192.168.64.64 willow
