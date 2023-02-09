@@ -23,6 +23,18 @@ spec:
     kubeEtcd:
       enabled: false
 
+    nodeSelector:
+      kubernetes.io/hostname: willow
+
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - willow
+
     # matched to service port 'prom-stack-kube-prometheus-kube-controller-manager' -n kube-system
     kubeControllerManager:
       enabled: true

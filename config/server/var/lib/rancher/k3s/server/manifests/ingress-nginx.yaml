@@ -26,3 +26,5 @@ spec:
     sidecar:
       datasources:
         enabled: true
+    nodeSelector:
+      kubernetes.io/hostname: buffy

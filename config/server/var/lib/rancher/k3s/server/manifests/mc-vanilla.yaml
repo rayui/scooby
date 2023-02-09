@@ -16,15 +16,101 @@ spec:
   repo: https://itzg.github.io/minecraft-server-charts/
   valuesContent: |-
     # ref: https://hub.docker.com/r/itzg/minecraft-server/
+    # https://github.com/itzg/minecraft-server-charts
+
+    image:
+      repository: itzg/minecraft-server
+      tag: latest
+      pullPolicy: IfNotPresent
+      pullSecret: ""
+
+    # ### WARNING ###
+    # Minecraft is not horizontally scalable, adjusting this will most likely break your setup.
+    # ### WARNING ###
+    replicaCount: 1
+
+    ## Configure resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
     resources:
       requests:
-        memory: 1024Mi
+        memory: 2048Mi
         cpu: 500m
+
+    # upgrade strategy type (e.g. Recreate or RollingUpdate)
+    strategyType: Recreate
+
+    nodeSelector:
+      kubernetes.io/hostname: buffy
+
+    tolerations: []
+
+    affinity: {}
 
     securityContext:
       # Security context settings
       runAsUser: 1000
-      fsGroup: 2000
+      fsGroup: 1000
+    # Most of these map to environment variables. See Minecraft for details:
+    # https://hub.docker.com/r/itzg/minecraft-server/
+    livenessProbe:
+      command:
+        - mc-health
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      failureThreshold: 20
+      successThreshold: 1
+      timeoutSeconds: 1
+    readinessProbe:
+      command:
+        - mc-health
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      failureThreshold: 20
+      successThreshold: 1
+      timeoutSeconds: 1
+    startupProbe:
+      command:
+        - mc-health
+      enabled: false
+      failureThreshold: 30
+      periodSeconds: 10
+
+    # initContainers:
+    #   - name: do-something
+    #     image: busybox
+    #     command: ['do', 'something']
+    #     volumesMounts:
+    #       - name: nfs
+    #         mountPath: /mnt/volume
+    #         readOnly: true
+    initContainers: []
+
+    # sidecarContainers:
+    #   - name: do-something
+    #     image: busybox
+    #     command: ['do', 'something']
+    #     volumesMounts:
+    #       - name: nfs
+    #         mountPath: /mnt/volume
+    #         readOnly: true
+    sidecarContainers: []
+
+    # extraVolumes:
+    #   - volumeMounts:
+    #       - name: nfs
+    #         mountPath: /mnt/volume
+    #         readOnly: true
+    #     volumes:
+    #       - name: nfs
+    #         server: some.nfs.server.com
+    #         path: /
+    #         mountOptions:
+    #           - port=2049
+    #           - hard
+    #           - vers=4
+    extraVolumes: []
+
     minecraftServer:
       # This must be overridden, since we can't accept this for the user.
       eula: "TRUE"
@@ -55,9 +141,9 @@ spec:
       # One of: peaceful, easy, normal, and hard
       difficulty: easy
       # A comma-separated list of player names to whitelist.
-      whitelist:
+      whitelist: "mechatron2000"
       # A comma-separated list of player names who should be admins.
-      ops:
+      ops: "mechatron2000"
       # A server icon URL for server listings. Auto-scaled and transcoded.
       icon:
       # Max connected players.
@@ -71,7 +157,7 @@ spec:
       # Enables command blocks.
       enableCommandBlock: true
       # If true, players will always join in the default gameMode even if they were previously set to something else.
-      forcegameMode: false
+      forcegameMode: true
       # Defines whether structures (such as villages) will be generated.
       generateStructures: true
       # If set to true, players will be set to spectator mode if they die.
@@ -89,13 +175,13 @@ spec:
       # Sets the area that non-ops can not edit (0 to disable)
       spawnProtection: 16
       # Max view distance (in chunks).
-      viewDistance: 20
+      viewDistance: 10
       # Define this if you want a specific map generation seed.
       levelSeed:
       # One of: creative, survival, adventure, spectator
-      gameMode: creative
+      gameMode: 1
       # Message of the Day
-      motd: "Welcome to Eastwood Road Minecraft!!!"
+      motd: "Welcome to Eastwood Road Minecraft Creative Mode!!!"
       # If true, enable player-vs-player damage.
       pvp: false
       # One of: DEFAULT, FLAT, LARGEBIOMES, AMPLIFIED, CUSTOMIZED
@@ -124,7 +210,7 @@ spec:
       # Check accounts against Minecraft account service.
       onlineMode: true
       # If you adjust this, you may need to adjust resources.requests above to match.
-      memory: 1024M
+      memory: 2048M
       # General JVM options to be passed to the Minecraft server invocation
       jvmOpts: ""
       # Options like -X that need to proceed general JVM options
@@ -134,20 +220,18 @@ spec:
       # see https://github.com/itzg/docker-minecraft-server#server-configuration
       overrideServerProperties: false
       # DEPRECATED: use top-level rconServiceAnnotations instead
-      serviceAnnotations: {
-        kubernetes.io/ingress.class: nginx
-      }
+      serviceAnnotations: {}
       serviceType: LoadBalancer
       ## Set the port used if the serviceType is NodePort
-      #nodePort:
+      nodePort:
       # Set the external port of the service, usefull when using the LoadBalancer service type
       servicePort: 25565
-      #clusterIP:
+      clusterIP:
       loadBalancerIP: 192.168.1.64
       # loadBalancerSourceRanges: []
       ## Set the externalTrafficPolicy in the Service to either Cluster or Local
       # externalTrafficPolicy: Cluster
-      #externalIPs:
+      externalIPs:
 
       # A list of Spigot resources/plugins IDs to download.
       spigetResources: []
@@ -330,7 +414,7 @@ spec:
 
       resources:
         requests:
-          memory: 1024Mi
+          memory: 512Mi
           cpu: 500m
 
       persistence:

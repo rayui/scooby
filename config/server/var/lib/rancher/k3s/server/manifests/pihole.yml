@@ -20,6 +20,8 @@ spec:
       capabilities:
         add: ["NET_ADMIN"]
   valuesContent: |-
+    nodeSelector:
+      kubernetes.io/hostname: buffy
     hostname: resolv
     virtualHost: resolv.buffy
     ingress:
@@ -46,6 +48,19 @@ spec:
       - address=/grafana.buffy/192.168.1.64
       - address=/alertmanager.buffy/192.168.1.64
       - address=/minecraft.buffy/192.168.1.64
+      - address=/serial/192.168.1.4
+      - address=/chromecast-lounge/192.168.1.5
+      - address=/hdmi/192.168.1.6
+      - address=/chromecast-bedroom/192.168.1.7
+      - address=/brother/192.168.1.10
+      - address=/snail/192.168.1.11
+      - address=/sol/192.168.1.13
+      - address=/slug/192.168.1.14
+      - address=/raybot/192.168.1.15
+      - address=/netgear-sw-1/192.168.1.251
+      - address=/unifi-1/192.168.1.252
+      - address=/unifi-0/192.168.1.253
+      - address=/netgear-sw-0/192.168.1.254
     podDnsConfig:
       enabled: false
       policy: "None"

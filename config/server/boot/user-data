@@ -35,6 +35,8 @@ bootcmd:
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby
   #xander install directory
   - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
+  # - apt-get update
+  # - apt-get upgrade
 
 runcmd:
 #CREATE CONFIG DIRS
@@ -77,8 +79,16 @@ runcmd:
 #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
   # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327 
-  - k3sup install --ip 192.168.1.64 --user spike --ssh-key "/home/spike/.ssh/id_ed25519" --k3s-extra-args "--flannel-backend=host-gw --disable traefik --kube-apiserver-arg service-node-port-range=1000-32767"
-  - cp /tmp/kubeconfig /root/.kube/config
+  - k3sup install >
+    --ip 192.168.1.64
+    --user spike
+    --ssh-key "/home/spike/.ssh/id_ed25519"
+    --k3s-extra-args "
+    --flannel-iface='eth1'
+    --disable 'traefik'
+    --kube-apiserver-arg 'service-node-port-range=1000-32767'
+    "
+  - cp ./kubeconfig /root/.kube/config
 
 #READY
   - wall "BUFFY WILL PATROL TONIGHT" 
