@@ -1,0 +1,36 @@
+#cloud-config
+# vim: syntax=yaml
+#
+
+# Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
+hostname: cordy
+manage_etc_hosts: true
+
+package_update: false 
+package_upgrade: false
+package_reboot_if_required: true
+
+users:
+  - default
+
+bootcmd:
+  # local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
+  - mkdir -p /var/lib/rancher
+  # - apt-get update
+  # - apt-get upgrade
+
+runcmd:
+  - cp /var/lib/scooby/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
+  - cp /var/lib/scooby/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
+  - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
+  - cd /tmp && curl -sLS https://get.k3sup.dev | sh
+  - k3sup join >
+    --ip 192.168.64.66 
+    --server-ip 192.168.64.1 
+    --user spike 
+    --server-user spike 
+    --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key" 
+    --k3s-extra-args " 
+      --node-name 'cordy' 
+    "
+  - wall "CORDY IS ONLINE BEEP BOOP"

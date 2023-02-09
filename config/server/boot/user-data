@@ -3,8 +3,8 @@
 #
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: buffy 
-manage_etc_hosts: false 
+hostname: buffy
+manage_etc_hosts: false
 
 package_update: false
 package_upgrade: false
@@ -35,50 +35,65 @@ bootcmd:
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby
   #xander install directory
   - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
+  #cordy install directory
+  - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby
   # - apt-get update
   # - apt-get upgrade
 
 runcmd:
-#CREATE CONFIG DIRS
+  #CREATE CONFIG DIRS
   - mkdir -p /root/.kube
 
-#SSH KEYS
+  #SSH KEYS
   - ssh-keygen -q -f /home/spike/.ssh/id_ed25519 -N "" -t ed25519
   - cat /home/spike/.ssh/id_ed25519.pub >> /home/spike/.ssh/authorized_keys
   - chown -R spike:spike /home/spike/.ssh/
 
-#SETUP TFTPBOOT
+  #SETUP TFTPBOOT
   - cp /boot/bootcode.bin /tftpboot
 
-#SETUP WILLOW TFTPBOOT
+  #SETUP WILLOW TFTPBOOT
   - ln -s /var/lib/scooby/agents/willow/boot /tftpboot/9686533c
 
-#WILLOW CLOUD CONFIG 
+  #WILLOW CLOUD CONFIG
   - mkdir -p /var/www/html/cloud-config/willow
   - ln -s /var/lib/scooby/agents/willow/boot/user-data /var/www/html/cloud-config/willow
   - ln -s /var/lib/scooby/agents/willow/boot/meta-data /var/www/html/cloud-config/willow
 
-#WILLOW KEYS
+  #WILLOW KEYS
   - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby/ssh/
   - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key
   - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key.pub
 
-#SETUP XANDER TFTPBOOT
+  #SETUP XANDER TFTPBOOT
   - ln -s /var/lib/scooby/agents/xander/boot /tftpboot/c6811a52
 
-#XANDER CLOUD CONFIG 
+  #XANDER CLOUD CONFIG
   - mkdir -p /var/www/html/cloud-config/xander
   - ln -s /var/lib/scooby/agents/xander/boot/user-data /var/www/html/cloud-config/xander
   - ln -s /var/lib/scooby/agents/xander/boot/meta-data /var/www/html/cloud-config/xander
 
-#XANDER KEYS
+  #XANDER KEYS
   - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby/ssh/
   - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key
   - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key.pub
 
-#K3S
+  #SETUP CORDY TFTPBOOT
+  - ln -s /var/lib/scooby/agents/cordy/boot /tftpboot/9686533c
+
+  #CORDY CLOUD CONFIG
+  - mkdir -p /var/www/html/cloud-config/cordy
+  - ln -s /var/lib/scooby/agents/cordy/boot/user-data /var/www/html/cloud-config/cordy
+  - ln -s /var/lib/scooby/agents/cordy/boot/meta-data /var/www/html/cloud-config/cordy
+
+  #CORDY KEYS
+  - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/
+  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key
+  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key.pub
+
+  #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327 
+  # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327
   - k3sup install >
     --ip 192.168.1.64
     --user spike
@@ -90,5 +105,5 @@ runcmd:
     "
   - cp ./kubeconfig /root/.kube/config
 
-#READY
-  - wall "BUFFY WILL PATROL TONIGHT" 
+  #READY
+  - wall "BUFFY WILL PATROL TONIGHT"

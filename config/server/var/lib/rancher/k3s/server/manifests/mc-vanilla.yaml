@@ -41,11 +41,18 @@ spec:
     strategyType: Recreate
 
     nodeSelector:
-      kubernetes.io/hostname: buffy
+      kubernetes.io/hostname: cordy
 
     tolerations: []
 
-    affinity: {}
+    affinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - cordy
 
     securityContext:
       # Security context settings
