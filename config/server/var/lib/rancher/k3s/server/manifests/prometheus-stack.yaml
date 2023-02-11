@@ -80,8 +80,6 @@ spec:
                   storage: 5Gi
         externalUrl: https://alerts.buffy/
         routePrefix: /
-        nodeSelector:
-          kubernetes.io/hostname: willow
 
       tplConfig: false
       # INSTEAD rely on helm --set-file "alertmanager.templateFiles.email\.default\.html\.tmpl"=pathtofile
@@ -142,16 +140,6 @@ spec:
         - secretName: tls-credential
           hosts:
           - grafana.buffy
-      nodeSelector:
-        kubernetes.io/hostname: willow
-
-    prometheusOperator:
-      nodeSelector:
-        kubernetes.io/hostname: willow
-      admissionWebhooks:
-        patch:
-          nodeSelector:
-            kubernetes.io/hostname: willow
 
     prometheus:
       ingress:
@@ -253,6 +241,3 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
-
-        nodeSelector:
-          kubernetes.io/hostname: willow
