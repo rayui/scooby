@@ -37,8 +37,6 @@ bootcmd:
   - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
   #cordy install directory
   - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby
-  # - apt-get update
-  # - apt-get upgrade
 
 runcmd:
   #CREATE CONFIG DIRS
@@ -79,7 +77,7 @@ runcmd:
   - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key.pub
 
   #SETUP CORDY TFTPBOOT
-  - ln -s /var/lib/scooby/agents/cordy/boot /tftpboot/9686533c
+  - ln -s /var/lib/scooby/agents/cordy/boot /tftpboot/731d2d75
 
   #CORDY CLOUD CONFIG
   - mkdir -p /var/www/html/cloud-config/cordy

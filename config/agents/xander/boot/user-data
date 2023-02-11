@@ -6,7 +6,7 @@
 hostname: xander
 manage_etc_hosts: true
 
-package_update: false 
+package_update: false
 package_upgrade: false
 package_reboot_if_required: true
 
@@ -16,10 +16,9 @@ users:
 bootcmd:
   # local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
   - mkdir -p /var/lib/rancher
-  # - apt-get update
-  # - apt-get upgrade
 
 runcmd:
+  - mount /var/lib/rancher
   - cp /var/lib/scooby/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
   - cp /var/lib/scooby/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
   - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
@@ -30,8 +29,5 @@ runcmd:
     --user spike
     --server-user spike
     --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key"
-    --k3s-extra-args
-      "
-      --node-name 'xander'
-      "
+    --k3s-extra-args "--node-name 'xander'"
   - wall "XANDER IS ONLINE BEEP BOOP"

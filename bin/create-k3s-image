@@ -12,17 +12,25 @@ if [[ ! ${OUTDEV} ]]; then
 fi
 
 #COPY IMAGE TO OUTPUT DEVICE 
+echo "COPY OS IMAGE TO DEVICE"
 dd if=${IMGPATH} of=${OUTDEV} bs=1M status=progress
+echo "COMPLETE"
 
 #RESIZE ROOTFS PARTITION
+echo "COPY OS IMAGE TO DEVICE"
 ROOTPARTSTART=$(sfdisk -l ${OUTDEV} | grep ${OUTDEV}2 | awk '{ print $2 }')
 sfdisk --delete ${OUTDEV} 2
 sfdisk -a ${OUTDEV} <<EOF
 ${ROOTPARTSTART},
 EOF
+echo "COMPLETE"
+
+echo "RESIZE OS PARTITION"
 resize2fs -f ${OUTDEV}2 20G
+echo "COMPLETE"
 
 #COPY BOOT FILES TO SERVER INSALL
+echo "COPY BOOT FILES TO SERVER"
 mkdir -p ${BOOTFSPATH}
 mkdir -p ${ROOTFSPATH}
 mkdir -p ${IMGMOUNT}
@@ -34,57 +42,72 @@ mount ${OUTDEV}2 ${ROOTFSPATH}
 cp -r ./config/server/boot/* ${BOOTFSPATH}
 cp -r ./config/server/* ${ROOTFSPATH}
 sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' ${BOOTFSPATH}/cmdline.txt
+echo "COMPLETE"
 
 #UNPACK WILLOW INSTALL FROM IMAGE
-
+echo "UNPACK WILLOW ROOTFS TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/
 mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
+echo "UNPACK WILLOW BOOT TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/willow/boot/
 mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/boot/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
 #CONFIGURE WILLOW IMAGE
 
+echo "COPY WILLOW CONFIG TO HOST"
 cp -r ./config/agents/willow/* ${ROOTFSPATH}/var/lib/scooby/agents/willow/
+echo "COMPLETE"
 
 #UNPACK XANDER INSTALL FROM IMAGE
 
+echo "UNPACK XANDER ROOTFS TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/xander/
 mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
+echo "UNPACK XANDER BOOT TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/xander/boot/
 mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/boot/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
 #CONFIGURE XANDER IMAGE
 
+echo "COPY XANDER CONFIG TO HOST"
 cp -r ./config/agents/xander/* ${ROOTFSPATH}/var/lib/scooby/agents/xander/
-
-umount ${BOOTFSPATH}
-umount ${ROOTFSPATH}
+echo "COMPLETE"
 
 #UNPACK CORDY INSTALL FROM IMAGE
-
+echo "UNPACK CORDY BOOT TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/cordy/
 mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/cordy/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
+echo "UNPACK CORDY BOOT TO HOST"
 mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/cordy/boot/
 mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
 rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/cordy/boot/
 umount ${IMGMOUNT}
+echo "COMPLETE"
 
 #CONFIGURE CORDY IMAGE
 
+echo "COPY CORDY CONFIG TO HOST"
 cp -r ./config/agents/cordy/* ${ROOTFSPATH}/var/lib/scooby/agents/cordy/
+echo "COMPLETE"
+
 
 umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}

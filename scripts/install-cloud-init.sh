@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-apt-get install cloud-init -y
-
 touch /boot/meta-data
 touch /boot/user-data
+
+apt-get install cloud-init -y
 
 cat - > /etc/cloud/templates/sources.list.debian.tmpl <<'EOF'
 ## template:jinja
