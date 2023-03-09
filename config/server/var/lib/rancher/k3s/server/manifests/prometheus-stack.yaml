@@ -19,6 +19,7 @@ spec:
     defaultRules:
       rules:
         etcd: false
+        alertmanager: false
 
     kubeEtcd:
       enabled: false
@@ -56,76 +57,8 @@ spec:
         port: 10249
         targetPort: 10249
 
-
     alertmanager:
-      ingress:
-        enabled: true
-        annotations:
-          kubernetes.io/ingress.class: nginx
-        hosts: ['alerts.buffy']
-        paths: ['/']
-        tls:
-        - secretName: tls-credential
-          hosts:
-          - alerts.buffy
-
-      alertmanagerSpec:
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: local-path
-              accessModes: ["ReadWriteOnce"]
-              resources:
-                requests:
-                  storage: 5Gi
-        externalUrl: https://alerts.buffy/
-        routePrefix: /
-
-      tplConfig: false
-      # INSTEAD rely on helm --set-file "alertmanager.templateFiles.email\.default\.html\.tmpl"=pathtofile
-      #templateFiles:
-      #  email.default.html.tmpl: |-
-      #    ... 
-      #  email.default.txt.tmpl: |-
-      #    ...
-
-      config:
-        global:
-          resolve_timeout: 5m
-          # global smtp settings
-          smtp_from: amgr@buffy
-          smtp_smarthost: 10.43.235.116:1025
-          smtp_require_tls: false
-
-        route:
-          group_by: ['alertname']
-          group_wait: 2s # not default 30
-          group_interval: 30s # not default 5m
-          repeat_interval: 4h # not default 12h
-          receiver: email_platform
-          routes:
-          - receiver: 'null'
-            matchers:
-              - alertname =~ "InfoInhibitor|Watchdog"
-          - receiver: email_platform
-            continue: true
-        receivers:
-        - name: email_platform
-          email_configs:
-          - to: platform@buffy
-            send_resolved: true
-            headers:
-              subject: "{{ .Status | toUpper }} {{ .CommonLabels.env }}:{{ .CommonLabels.cluster }} {{ .CommonLabels.alertname }}"
-            #html: "{{ range .Alerts }}{{ .Annotations.description }}<br/>{{ end }}"
-            # proper syntax for external template ready by alertmanager
-            # defining both these values will send email in multipart/alternative
-            #html: '{{ template "emaildefaulthtml" . }}'
-            #text: '{{ template "emaildefaulttxt" . }}'
-
-        - name: 'null'
-        templates:
-        - '/etc/alertmanager/config/*.tmpl'
-
+      enabled: false
 
     grafana:
       # username is 'admin'
@@ -140,6 +73,20 @@ spec:
         - secretName: tls-credential
           hosts:
           - grafana.buffy
+      nodeSelector:
+        kubernetes.io/hostname: willow
+
+    prometheusOperator:
+      nodeSelector:
+        kubernetes.io/hostname: willow
+      admissionWebhooks:
+        patch:
+          nodeSelector:
+            kubernetes.io/hostname: willow
+
+    kube-state-metrics:
+      nodeSelector:
+        kubernetes.io/hostname: willow
 
     prometheus:
       ingress:
@@ -148,10 +95,9 @@ spec:
           kubernetes.io/ingress.class: nginx
         hosts: ['prometheus.buffy']
         paths: ['/']
-        tls:
-        - secretName: tls-credential
-          hosts:
-          - prometheus.buffy
+
+      nodeSelector:
+        kubernetes.io/hostname: willow
 
       prometheusSpec:
         externalUrl: "https://prometheus.buffy/"

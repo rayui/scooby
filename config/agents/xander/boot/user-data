@@ -18,7 +18,6 @@ bootcmd:
   - mkdir -p /var/lib/rancher
 
 runcmd:
-  - mount /var/lib/rancher
   - cp /var/lib/scooby/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
   - cp /var/lib/scooby/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
   - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys

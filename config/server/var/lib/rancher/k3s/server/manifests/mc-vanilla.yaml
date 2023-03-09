@@ -34,8 +34,8 @@ spec:
     ##
     resources:
       requests:
-        memory: 2048Mi
-        cpu: 500m
+        memory: 3000Mi
+        cpu: 900m
 
     # upgrade strategy type (e.g. Recreate or RollingUpdate)
     strategyType: Recreate
@@ -172,7 +172,7 @@ spec:
       # The maximum height in which building is allowed.
       maxBuildHeight: 256
       # The maximum number of milliseconds a single tick may take before the server watchdog stops the server with the message. -1 disables this entirely.
-      maxTickTime: 60000
+      maxTickTime: -1
       # Determines if animals will be able to spawn.
       spawnAnimals: true
       # Determines if monsters will be spawned.
@@ -186,7 +186,7 @@ spec:
       # Define this if you want a specific map generation seed.
       levelSeed:
       # One of: creative, survival, adventure, spectator
-      gameMode: 1
+      gameMode: creative
       # Message of the Day
       motd: "Welcome to Eastwood Road Minecraft Creative Mode!!!"
       # If true, enable player-vs-player damage.
@@ -217,7 +217,7 @@ spec:
       # Check accounts against Minecraft account service.
       onlineMode: true
       # If you adjust this, you may need to adjust resources.requests above to match.
-      memory: 2048M
+      memory: 3000M
       # General JVM options to be passed to the Minecraft server invocation
       jvmOpts: ""
       # Options like -X that need to proceed general JVM options
@@ -327,8 +327,8 @@ spec:
       # storageClass: "-"
       dataDir:
         # Set this to false if you don't care to persist state between restarts.
-        enabled: false
-        Size: 1Gi
+        enabled: true
+        Size: 5Gi
         # existingClaim: nil
         ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
         # subPath: /path/to/dataDir

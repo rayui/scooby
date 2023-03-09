@@ -48,6 +48,7 @@ spec:
       - address=/grafana.buffy/192.168.1.64
       - address=/alertmanager.buffy/192.168.1.64
       - address=/minecraft.buffy/192.168.1.64
+      - address=/tv.buffy/192.168.1.64
       - address=/serial/192.168.1.4
       - address=/chromecast-lounge/192.168.1.5
       - address=/hdmi/192.168.1.6
