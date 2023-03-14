@@ -48,7 +48,6 @@ spec:
     - name: api
       port: 3000
       protocol: TCP
-      nodePort: 3000
       targetPort: 3000
 ---
 apiVersion: networking.k8s.io/v1

@@ -28,5 +28,5 @@ runcmd:
     --user spike
     --server-user spike
     --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key"
-    --k3s-extra-args "--node-name 'xander'"
+    --k3s-extra-args "--node-name 'xander' --node-label 'smarter-device-manager=enabled'"
   - wall "XANDER IS ONLINE BEEP BOOP"
