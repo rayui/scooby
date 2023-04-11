@@ -122,7 +122,7 @@ spec:
       # This must be overridden, since we can't accept this for the user.
       eula: "TRUE"
       # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
-      version: "1.12.2"
+      version: "1.19.4"
       # This can be one of "VANILLA", "FORGE", "SPIGOT", "BUKKIT", "PAPER", "FTBA", "SPONGEVANILLA", "CURSEFORGE"
       type: "VANILLA"
       # If type is set to FORGE, this sets the version; this is ignored if forgeInstallerUrl is set
@@ -331,7 +331,7 @@ spec:
         Size: 5Gi
         # existingClaim: nil
         ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
-        # subPath: /path/to/dataDir
+        subPath: minecraft_1.19.4 
 
     podAnnotations: {}
 
