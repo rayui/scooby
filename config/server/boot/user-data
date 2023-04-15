@@ -37,6 +37,8 @@ bootcmd:
   - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
   #cordy install directory
   - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby
+  #giles install directory
+  - mkdir -p /var/lib/scooby/agents/giles/var/lib/scooby
 
 runcmd:
   #CREATE CONFIG DIRS
@@ -88,6 +90,19 @@ runcmd:
   - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/
   - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key
   - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key.pub
+
+  #SETUP GILES TFTPBOOT
+  - ln -s /var/lib/scooby/agents/giles/boot /tftpboot/7331e520
+
+  #GILES CLOUD CONFIG
+  - mkdir -p /var/www/html/cloud-config/giles
+  - ln -s /var/lib/scooby/agents/giles/boot/user-data /var/www/html/cloud-config/giles
+  - ln -s /var/lib/scooby/agents/giles/boot/meta-data /var/www/html/cloud-config/giles
+
+  #GILES KEYS
+  - mkdir -p /var/lib/scooby/agents/giles/var/lib/scooby/ssh/
+  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/giles/var/lib/scooby/ssh/spike_ed25519_key
+  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/giles/var/lib/scooby/ssh/spike_ed25519_key.pub
 
   #K3S
   - cd /tmp && curl -sLS https://get.k3sup.dev | sh

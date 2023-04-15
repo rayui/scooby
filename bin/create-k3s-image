@@ -108,6 +108,27 @@ echo "COPY CORDY CONFIG TO HOST"
 cp -r ./config/agents/cordy/* ${ROOTFSPATH}/var/lib/scooby/agents/cordy/
 echo "COMPLETE"
 
+UNPACK GILES INSTALL FROM IMAGE
+
+echo "UNPACK GILES ROOTFS TO HOST"
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/giles/
+mount -o loop,offset=272629760 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/giles/
+umount ${IMGMOUNT}
+echo "COMPLETE"
+
+echo "UNPACK GILES BOOT TO HOST"
+mkdir -p ${ROOTFSPATH}/var/lib/scooby/agents/giles/boot/
+mount -o loop,offset=4194304 ${IMGPATH} ${IMGMOUNT}
+rsync -xa --progress ${IMGMOUNT}/* ${ROOTFSPATH}/var/lib/scooby/agents/giles/boot/
+umount ${IMGMOUNT}
+echo "COMPLETE"
+
+#CONFIGURE GILES IMAGE
+
+echo "COPY GILES CONFIG TO HOST"
+cp -r ./config/agents/giles/* ${ROOTFSPATH}/var/lib/scooby/agents/giles/
+echo "COMPLETE"
 
 umount ${BOOTFSPATH}
 umount ${ROOTFSPATH}
