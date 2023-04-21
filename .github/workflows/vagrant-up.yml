@@ -1,0 +1,15 @@
+name: ci
+on:
+  push:
+    branches:
+      - "main"
+jobs:
+  vagrant-up:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Run vagrant up
+        run: vagrant up --provider libvirt
+      - name: Build image
+        run: vagrant ssh -c "cd /vagrant && ./build.sh"
