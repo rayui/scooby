@@ -10,6 +10,6 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
       - name: Run vagrant up
-        run: vagrant up --provider libvirt
+        run: vagrant up
       - name: Build image
         run: vagrant ssh -c "cd /vagrant && ./build.sh"
