@@ -5,10 +5,17 @@ on:
       - "main"
 jobs:
   vagrant-up:
-    runs-on: macos-10.15 
+    runs-on: macos-10.15
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
       - name: Run vagrant up
         run: vagrant up
       - name: Build image
