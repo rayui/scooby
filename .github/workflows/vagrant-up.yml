@@ -20,3 +20,8 @@ jobs:
         run: vagrant up
       - name: Build image
         run: vagrant ssh -c "cd /vagrant && ./build.sh"
+      - name: Upload image to artifacts storage
+        uses: actions/upload-artifact@v3
+        with:
+          name: scooby-latest
+          path: images/rpi-cloud-init-raspios-bullseye-arm64.img
