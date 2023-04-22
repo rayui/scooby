@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "DEBUG: TESTING SSH AUTH KEY ${SSH_AUTH_KEY}"
+
 touch /boot/meta-data
 touch /boot/user-data
 
@@ -21,7 +23,7 @@ deb {{mirror}} {{codename}} main contrib non-free rpi
 deb-src {{mirror}} {{codename}} main contrib non-free rpi
 EOF
 
-cat - > /etc/cloud/cloud.cfg.d/99_fake_cloud.cfg <<'EOF'
+cat - > /etc/cloud/cloud.cfg.d/99_fake_cloud.cfg << EOF
 # configure cloud-init for NoCloud
 datasource_list: [ NoCloud, None ]
 datasource:
@@ -29,7 +31,7 @@ datasource:
     fs_label: boot
 EOF
 
-cat - > /etc/cloud/cloud.cfg.d/99_raspbian.cfg <<'EOF'
+cat - > /etc/cloud/cloud.cfg.d/99_raspbian.cfg << EOF
 system_info:
   default_user:
     name: spike 
@@ -44,8 +46,11 @@ system_info:
         security: http://raspbian.raspberrypi.org/raspbian
 
 ssh_authorized_keys:
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuUOzRM1sPenNhmf75aU473eNoH/UGcMfJKITGCXpxayP9dGWyytjpKa1Xuu4TJXHtqqE/dpZSo6TlmoK0pmOR0bt0Knp0YslriNBRL+hRsqYcKat8vSOhUSz0otxBR3eC5x4/7jBBuwLGNM3tyQL/3pGDw9FVntJ1clqRW881F6r7qcan5VOkyviwtYldG0haIV2XoQ7GMB2AJytokj/xrSJBlNEzda4WH9MwpnO8zF2YSoHsdh+qNAzwFvvI2+34CDk3oBM/vzi48dHjVm/a3S6ymCL/zlfMKjrFUgSAqrlz8JNJwp0v43Lf2W1+vEUZAFSDil18VFZS3WkkiMbV8vHYzwVEh2u3PFmcV4IHooam7zNeSL4mGRHIM4F0+9PJ80adQsBH1UGcw+7K926b4WrJWXtolh+g2wDjSmJY/moAGLoiQXtoeBYiw9S7FeNaR+gLYfFgtq0s81C0uCBus3L5a8a4u+oth4D5e1YRHqBFGOmKt1qKwu99xpBFePawf/VFp8s4yEf+koe/oX1hdLUnYHaap/EvX2M0Tb0Y1NMEpfcLwUx1IiGlCdQ7Cu4OA0PVMYartcWi291CigxSC65lkl4iUQejtv9tqKFW+tfA9iITpKSOeyXJbhWpMOTgNygXpMiqNq4s14t+1S3A0NsEyzRei0FE4Cs3Qo5N2w== ray.userinterface@gmail.com
+  - ${SSH_AUTH_KEY}
 EOF
+
+echo "DEBUG: 99_raspbian.cfg"
+cat /etc/cloud/cloud.cfg.d/99_raspbian.cfg
 
 #add required arguments to kernel
 sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
