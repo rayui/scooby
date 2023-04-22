@@ -26,10 +26,5 @@ jobs:
       #     name: scooby-latest
       #     path: images/rpi-cloud-init-raspios-bullseye-arm64.img
       - name: Upload image to S3
-        uses: shallwefootball/s3-upload-action@master
-        with:
-          aws_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          source_dir: "images"
+        run: AWS_ACCESS_KEY_ID=${{secrets.AWS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} AWS_REGION=${{secrets.AWS_REGION}} aws s3 cp ./*.img s3://${{secrets.AWS_BUCKET}}/images
+        working-directory: images
