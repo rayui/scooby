@@ -5,7 +5,7 @@ on:
       - "main"
 jobs:
   vagrant-up:
-    runs-on: ubuntu-latest
+    runs-on: macos-10.15
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
@@ -16,12 +16,10 @@ jobs:
           key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
           restore-keys: |
             ${{ runner.os }}-vagrant-
-      - name: update apt
-        run: sudo apt -y update
-      - name: install vagrant
-        run: sudo apt install -y vagrant
+      - name: Set SSH_AUTH_KEY env var
+        run: export SSH_AUTH_KEY="${{secrets.SSH_AUTH_KEY}}"
       - name: Run vagrant up
-        run: sudo vagrant up
+        run: vagrant up
       - name: Build image
         run: vagrant ssh -c "cd /vagrant && ./build.sh"
       - name: Upload image to S3
