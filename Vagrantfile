@@ -1,5 +1,4 @@
 $script = <<-SCRIPT
-  echo "SSH AUTH KEY: ${SSH_AUTH_KEY}"
   sudo apt update -y
   sudo apt install -y curl
   curl -sL get.hashi-up.dev | sudo sh
@@ -14,5 +13,5 @@ Vagrant.configure("2") do |config|
     vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
   end
 
-  config.vm.provision "shell", env: { "SSH_AUTH_KEY" => ENV['SSH_AUTH_KEY']}, inline: $script
+  config.vm.provision "shell", inline: $script
 end
