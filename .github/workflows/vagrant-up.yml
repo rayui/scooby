@@ -17,7 +17,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-vagrant-
       - name: Run vagrant up
-        run: vagrant up
+        run: SSH_AUTH_KEY=${{secrets.SSH_AUTH_KEY}} vagrant up
       - name: Build image
         run: vagrant ssh -c "cd /vagrant && ./build.sh"
       - name: Upload image to S3
