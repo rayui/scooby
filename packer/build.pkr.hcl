@@ -1,3 +1,4 @@
+variable "ssh_auth_key" {}
 
 build {
   sources = [
@@ -8,5 +9,6 @@ build {
     scripts = [
       "scripts/install-cloud-init.sh"
     ]
+    environment_vars = ["SSH_AUTH_KEY=${var.ssh_auth_key}"]
   }
 }
