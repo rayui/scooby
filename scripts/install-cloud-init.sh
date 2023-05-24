@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "DEBUG: TESTING SSH AUTH KEY ${SSH_AUTH_KEY}"
-
 touch /boot/meta-data
 touch /boot/user-data
 
@@ -48,9 +46,6 @@ system_info:
 ssh_authorized_keys:
   - ${SSH_AUTH_KEY}
 EOF
-
-echo "DEBUG: 99_raspbian.cfg"
-cat /etc/cloud/cloud.cfg.d/99_raspbian.cfg
 
 #add required arguments to kernel
 sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt

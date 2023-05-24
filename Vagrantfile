@@ -1,7 +1,6 @@
 $script = <<-SCRIPT
   apt update -y
   apt install -y curl
-  rm /etc/default/locale
   curl -sL get.hashi-up.dev | sh
   hashi-up packer get -d /usr/local/bin
 SCRIPT
