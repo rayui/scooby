@@ -1,0 +1,72 @@
+name: ci
+on:
+  push:
+    branches:
+      - "main"
+jobs:
+  vagrant-up:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
+      - name: Run vagrant update
+        run: vagrant box update
+      - name: Install vbguest plugin
+        run: vagrant plugin install vagrant-vbguest
+      - name: Run vagrant up
+        run: vagrant up
+        env:
+          LC_ALL: en_US.UTF-8
+          VAGRANT_DISABLE_VBOXSYMLINKCREATE: 1
+          PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
+      - name: Build image
+        run: vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_IMAGE_HREF,LC_IMAGE_SHA,LC_DEFAULT_USER,LC_SSH_AUTH_KEY,LC_PACKER_GITHUB_API_TOKEN ./scripts/build-image.sh"
+        env:
+          LC_ALL: en_US.UTF-8
+          LC_IMAGE_HREF: ${{vars.LC_IMAGE_HREF}}
+          LC_IMAGE_SHA: ${{vars.LC_IMAGE_SHA}}
+          LC_SSH_AUTH_KEY: ${{secrets.SSH_AUTH_KEY}}
+          LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
+          LC_PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
+      - name: Upload base agent image to S3
+        run: aws s3 cp ./scooby.img ${{secrets.AWS_BUCKET_S3_URI}}/scooby-agent-latest-arm64.img
+        working-directory: images
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: ${{secrets.AWS_REGION}}
+      - name: Create agent image presigned download
+        id: create_agent_href
+        run: echo "LC_AGENT_IMAGE_HREF=$(aws s3 presign --expires-in 86400 ${{secrets.AWS_BUCKET_S3_URI}}/scooby-agent-latest-arm64.img)" >> "$GITHUB_OUTPUT"
+        working-directory: images
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: ${{secrets.AWS_REGION}}
+      - name: Configure server image
+        run: vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_IP,LC_INTERNAL_IP,LC_INTERNAL_DEVICE,LC_DEFAULT_USER,LC_AGENT_IMAGE_HREF ./scripts/configure-image.sh"
+        env:
+          LC_ALL: en_US.UTF-8
+          LC_EXTERNAL_IP: ${{secrets.LC_EXTERNAL_IP}}
+          LC_INTERNAL_IP: ${{secrets.LC_INTERNAL_IP}}
+          LC_INTERNAL_DEVICE: ${{secrets.LC_INTERNAL_DEVICE}}
+          LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
+          LC_AGENT_IMAGE_HREF: ${{ steps.create_agent_href.outputs.LC_AGENT_IMAGE_HREF }}
+      - name: Upload server image to S3
+        id: create_server_href
+        run: aws s3 cp ./scooby.img ${{secrets.AWS_BUCKET_S3_URI}}/scooby-latest-arm64.img
+        working-directory: images
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: ${{secrets.AWS_REGION}}
+      - name: Destroy vagrant
+        if: always()
+        run: vagrant --no-tty -f destroy

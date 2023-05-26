@@ -12,111 +12,26 @@ package_reboot_if_required: true
 
 packages:
   - vim
+  - libarchive-tools
+  - git
+  - curl
+  - unzip
+  - rsync
   - dnsmasq
   - bind9-utils
   - dnsutils
   - iptables
   - iptables-persistent
-  - libarchive-tools
   - nfs-server
   - lighttpd
-  - git
+  - cloud-init
 
 users:
   - default
 
 bootcmd:
-  #this must be here for dnsmasq startup
-  - mkdir -p /tftpboot
   #install directory and nfs folders. this must be here for nfs-kernel-server startup
-  - mkdir -p /var/lib/scooby/agents/
   - mkdir -p /var/lib/minecraft-data/
-  #willow install directory
-  - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby
-  #xander install directory
-  - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby
-  #cordy install directory
-  - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby
-  #giles install directory
-  - mkdir -p /var/lib/scooby/agents/giles/var/lib/scooby
 
 runcmd:
-  #CREATE CONFIG DIRS
-  - mkdir -p /root/.kube
-
-  #SSH KEYS
-  - ssh-keygen -q -f /home/spike/.ssh/id_ed25519 -N "" -t ed25519
-  - cat /home/spike/.ssh/id_ed25519.pub >> /home/spike/.ssh/authorized_keys
-  - chown -R spike:spike /home/spike/.ssh/
-
-  #SETUP TFTPBOOT
-  - cp /boot/bootcode.bin /tftpboot
-
-  #SETUP WILLOW TFTPBOOT
-  - ln -s /var/lib/scooby/agents/willow/boot /tftpboot/9686533c
-
-  #WILLOW CLOUD CONFIG
-  - mkdir -p /var/www/html/cloud-config/willow
-  - ln -s /var/lib/scooby/agents/willow/boot/user-data /var/www/html/cloud-config/willow
-  - ln -s /var/lib/scooby/agents/willow/boot/meta-data /var/www/html/cloud-config/willow
-
-  #WILLOW KEYS
-  - mkdir -p /var/lib/scooby/agents/willow/var/lib/scooby/ssh/
-  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key
-  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/willow/var/lib/scooby/ssh/spike_ed25519_key.pub
-
-  #SETUP XANDER TFTPBOOT
-  - ln -s /var/lib/scooby/agents/xander/boot /tftpboot/c6811a52
-
-  #XANDER CLOUD CONFIG
-  - mkdir -p /var/www/html/cloud-config/xander
-  - ln -s /var/lib/scooby/agents/xander/boot/user-data /var/www/html/cloud-config/xander
-  - ln -s /var/lib/scooby/agents/xander/boot/meta-data /var/www/html/cloud-config/xander
-
-  #XANDER KEYS
-  - mkdir -p /var/lib/scooby/agents/xander/var/lib/scooby/ssh/
-  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key
-  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/xander/var/lib/scooby/ssh/spike_ed25519_key.pub
-
-  #SETUP CORDY TFTPBOOT
-  - ln -s /var/lib/scooby/agents/cordy/boot /tftpboot/731d2d75
-
-  #CORDY CLOUD CONFIG
-  - mkdir -p /var/www/html/cloud-config/cordy
-  - ln -s /var/lib/scooby/agents/cordy/boot/user-data /var/www/html/cloud-config/cordy
-  - ln -s /var/lib/scooby/agents/cordy/boot/meta-data /var/www/html/cloud-config/cordy
-
-  #CORDY KEYS
-  - mkdir -p /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/
-  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key
-  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/cordy/var/lib/scooby/ssh/spike_ed25519_key.pub
-
-  #SETUP GILES TFTPBOOT
-  - ln -s /var/lib/scooby/agents/giles/boot /tftpboot/7331e520
-
-  #GILES CLOUD CONFIG
-  - mkdir -p /var/www/html/cloud-config/giles
-  - ln -s /var/lib/scooby/agents/giles/boot/user-data /var/www/html/cloud-config/giles
-  - ln -s /var/lib/scooby/agents/giles/boot/meta-data /var/www/html/cloud-config/giles
-
-  #GILES KEYS
-  - mkdir -p /var/lib/scooby/agents/giles/var/lib/scooby/ssh/
-  - cp /home/spike/.ssh/id_ed25519 /var/lib/scooby/agents/giles/var/lib/scooby/ssh/spike_ed25519_key
-  - cp /home/spike/.ssh/id_ed25519.pub /var/lib/scooby/agents/giles/var/lib/scooby/ssh/spike_ed25519_key.pub
-
-  #K3S
-  - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327
-  - k3sup install >
-    --ip 192.168.1.64
-    --user spike
-    --ssh-key "/home/spike/.ssh/id_ed25519"
-    --k3s-extra-args "
-    --flannel-iface='eth1'
-    --disable 'traefik'
-    --kube-apiserver-arg 'service-node-port-range=1000-32767'
-    "
-  - cp ./kubeconfig /root/.kube/config
-
-  #READY
-  - wall "BUFFY WILL PATROL TONIGHT"
+  - /usr/local/bin/finalize-cloud-init.sh

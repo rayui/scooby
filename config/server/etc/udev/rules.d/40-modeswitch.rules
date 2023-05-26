@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+
+ACTION!="add|change", GOTO="end_modeswitch"
+KERNEL!="sr[0-9]*", GOTO="end_modeswitch"
+SUBSYSTEM!="block", GOTO="end_modeswitch"
+
+# Realtek RTL8152 chipset USB lan NIC
+#   initial cdrom mode 0bda:8151, lan mode 0bda:8153
+ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="8151", RUN+="/usr/local/bin/reset_8152.sh"

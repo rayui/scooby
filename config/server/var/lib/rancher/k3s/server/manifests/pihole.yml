@@ -14,11 +14,6 @@ spec:
   chart: pihole
   targetNamespace: pihole
   repo: https://mojo2600.github.io/pihole-kubernetes/
-  containers:
-    securityContext:
-      privileged: true
-      capabilities:
-        add: ["NET_ADMIN"]
   valuesContent: |-
     nodeSelector:
       kubernetes.io/hostname: buffy
@@ -27,17 +22,16 @@ spec:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: nginx
+        kubernetes.io/ingress.class: traefik
       hosts:
       - resolv.buffy
+    privileged: "true"
     serviceWeb:
-      annotations:
-        kubernetes.io/ingress.class: nginx
+      type: LoadBalancer
+      loadBalancerIP: 192.168.1.64
     serviceDhcp:
       enabled: false
     serviceDns:
-      annotations:
-        kubernetes.io/ingress.class: nginx
       type: LoadBalancer
       loadBalancerIP: 192.168.1.64
     dnsmasq:

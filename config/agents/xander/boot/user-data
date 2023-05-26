@@ -18,15 +18,5 @@ bootcmd:
   - mkdir -p /var/lib/rancher
 
 runcmd:
-  - cp /var/lib/scooby/ssh/spike_ed25519_key /home/spike/.ssh/id_ed25519
-  - cp /var/lib/scooby/ssh/spike_ed25519_key.pub /home/spike/.ssh/id_ed25519.pub
-  - cat /var/lib/scooby/ssh/spike_ed25519_key.pub >> /home/spike/.ssh/authorized_keys
-  - cd /tmp && curl -sLS https://get.k3sup.dev | sh
-  - k3sup join >
-    --ip 192.168.64.65
-    --server-ip 192.168.64.1
-    --user spike
-    --server-user spike
-    --ssh-key "/var/lib/scooby/ssh/spike_ed25519_key"
-    --k3s-extra-args "--node-name 'xander' --node-label 'smarter-device-manager=enabled'"
+  - sh /usr/local/bin/finalize-cloud-init.sh
   - wall "XANDER IS ONLINE BEEP BOOP"

@@ -46,9 +46,8 @@ spec:
     name: lg-tv-web-backend
   ports:
     - name: api
-      port: 80
+      port: 3000
       protocol: TCP
-      targetPort: 3000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -56,7 +55,7 @@ metadata:
   name: lg-tv-web-ingress
   namespace: media
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
     - host: tv.buffy
@@ -68,4 +67,4 @@ spec:
               service:
                 name: lg-tv-web-service
                 port:
-                  number: 80
+                  number: 3000

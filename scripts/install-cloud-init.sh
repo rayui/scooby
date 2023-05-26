@@ -1,10 +1,14 @@
 #!/bin/bash
+
 set -e
 
 touch /boot/meta-data
 touch /boot/user-data
 
-apt-get install cloud-init -y
+apt-get update
+apt-get install -y cloud-init
+
+echo "INSTALLED PACKAGES"
 
 cat - > /etc/cloud/templates/sources.list.debian.tmpl <<'EOF'
 ## template:jinja
@@ -32,7 +36,7 @@ EOF
 cat - > /etc/cloud/cloud.cfg.d/99_raspbian.cfg << EOF
 system_info:
   default_user:
-    name: spike 
+    name: ${DEFAULT_USER} 
     lock_passwd: true 
     groups: [adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio]
     sudo: ["ALL=(ALL) NOPASSWD: ALL"]
@@ -52,6 +56,11 @@ sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/
 
 #disable wifi and bluetooth
 sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
+
+#CREATE COMMON BOOT FILES
+touch /boot/ssh
+print "#cloud-config\n# vim: syntax=yaml\n#\n" > /boot/meta-data
+printf "version: 2\nethernets:\n  eth0:\n    dhcp4: true\n" > /boot/network-config
 
 # Disable dhcpcd - it has a conflict with cloud-init network config
 systemctl mask dhcpcd
