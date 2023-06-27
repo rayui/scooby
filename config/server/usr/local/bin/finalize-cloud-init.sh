@@ -2,9 +2,9 @@
 
 IMGDIR=/var/lib/scooby/images
 IMGNAME=agent-scooby.img
-IMGPATH=${IMGDIR}${IMGNAME}
-BOOT_MNT=/tmp/mnt/boot
-ROOT_MNT=/tmp/mnt/root
+IMGPATH=${IMGDIR}/${IMGNAME}
+BOOT_MNT=/mnt/boot
+ROOT_MNT=/mnt/root
 
 AGENTCONFIGPATH=/etc/scooby/agents
 AGENTINSTANCEPATH=/var/lib/scooby/agents
@@ -22,22 +22,30 @@ chown -R ${LC_DEFAULT_USER}:${LC_DEFAULT_USER} /home/${LC_DEFAULT_USER}/.ssh/
 mkdir -p ${IMGDIR}
 curl -o ${IMGPATH} ${LC_AGENT_IMAGE_HREF}
 
-#Mount BOOT and configure
-
-mkdir -p ${BOOT_MNT}
-BOOTFSOFFSET=$(sfdisk -o Start -lqqq ${IMGPATH} | tail -n 2 | head -n 1 | { read S; echo $((512*$S));})
-mount -o loop,offset=${BOOTFSOFFSET} ${IMGPATH} ${BOOT_MNT}
+#MOUNT IMAGE AS LOOP DEVICE
+losetup -Pf ${IMGPATH}
+mkdir -p ${BOOT_MNT}/boot
+mkdir -p ${ROOT_MNT}
+mount /dev/loop0p1 ${BOOT_MNT}/boot
+mount /dev/loop0p2 ${ROOT_MNT}
 
 #copy bootcode.bin to /tftpboot
-rsync -xa --progress ${BOOT_MNT}/bootcode.bin /tftpboot/
+rsync -xa --progress ${BOOT_MNT}/boot/bootcode.bin /tftpboot/
 
-AGENTS=$(find ${AGENTCONFIGPATH}/* -maxdepth 0 -type d -printf "%f\n")
+AGENTS=$(find ${AGENTINSTANCEPATH}/* -maxdepth 0 -type d -printf "%f\n")
 for AGENT in ${AGENTS}
 do
-  echo "UNPACK AGENT BOOT TO HOST"
-  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}/boot/
-  rsync -xa --progress ${BOOT_MNT}/* ${AGENTINSTANCEPATH}/${AGENT}/boot/
-  rsync -xa --progress -r ${AGENTCONFIGPATH}/${AGENT}/boot/* ${AGENTINSTANCEPATH}/${AGENT}/boot/
+  echo "MOUNT AGENT UNION FS DIRECTORY"
+  mount -t unionfs -o dirs=${AGENTINSTANCEPATH}/${AGENT}:${AGENTCONFIGPATH}/${AGENT}=ro:${BOOT_MNT}=ro:${ROOT_MNT}=ro none ${AGENTINSTANCEPATH}/${AGENT}
+
+  #COPY BINARIES
+  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}/usr/local/bin
+  rsync -xa --progress -r usr/local/bin/finalize-cloud-init-agent.sh ${AGENTINSTANCEPATH}/${AGENT}/usr/local/bin/
+
+  #AGENT KEYS
+  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key.pub
 
   #SETUP AGENT TFTPBOOT
   ln -s ${AGENTINSTANCEPATH}/${AGENT}/boot /tftpboot/$(cat ${AGENTCONFIGPATH}/${AGENT}/tftp_client_id)
@@ -47,35 +55,6 @@ do
   ln -s ${AGENTINSTANCEPATH}/${AGENT}/boot/user-data /var/www/html/cloud-config/${AGENT}
   ln -s ${AGENTINSTANCEPATH}/${AGENT}/boot/meta-data /var/www/html/cloud-config/${AGENT}
 done
-
-umount ${BOOT_MNT}
-
-#Mount ROOT and configure
-
-mkdir -p ${ROOT_MNT}
-ROOTFSOFFSET=$(sfdisk -o Start -lqqq ${IMGPATH} | tail -n 1 | { read S; echo $((512*$S));})
-mount -o loop,offset=${ROOTFSOFFSET} ${IMGPATH} ${ROOT_MNT}
-
-AGENTS=$(find ${AGENTCONFIGPATH}/* -maxdepth 0 -type d -printf "%f\n")
-for AGENT in $AGENTS
-do
-  echo "UNPACK AGENT ROOTFS TO HOST"
-  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}/
-  rsync -xa --progress ${ROOT_MNT}/* ${AGENTINSTANCEPATH}/${AGENT}/
-
-  echo "COPY AGENT FILES TO HOST"
-  rsync -xa --progress -r ${AGENTCONFIGPATH}/${AGENT}/etc/* ${AGENTINSTANCEPATH}/${AGENT}/etc/
-
-  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}/usr/local/bin
-  rsync -xa --progress -r usr/local/bin/finalize-cloud-init-agent.sh ${AGENTINSTANCEPATH}/${AGENT}/usr/local/bin/
-
-  #AGENT KEYS
-  mkdir -p ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${AGENTINSTANCEPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key.pub
-done
-
-umount ${ROOT_MNT}
 
 #K3S
 

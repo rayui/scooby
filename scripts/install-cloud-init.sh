@@ -59,7 +59,7 @@ sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
 
 #CREATE COMMON BOOT FILES
 touch /boot/ssh
-print "#cloud-config\n# vim: syntax=yaml\n#\n" > /boot/meta-data
+printf "#cloud-config\n# vim: syntax=yaml\n#\n" > /boot/meta-data
 printf "version: 2\nethernets:\n  eth0:\n    dhcp4: true\n" > /boot/network-config
 
 # Disable dhcpcd - it has a conflict with cloud-init network config
