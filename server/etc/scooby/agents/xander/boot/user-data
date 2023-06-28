@@ -1,0 +1,17 @@
+#cloud-config
+# vim: syntax=yaml
+#
+
+# Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
+hostname: xander
+manage_etc_hosts: true
+
+package_update: false
+package_upgrade: false
+package_reboot_if_required: true
+
+users:
+  - default
+
+runcmd:
+  - sh /usr/local/bin/finalize-cloud-init-agent.sh

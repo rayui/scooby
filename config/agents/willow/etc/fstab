@@ -1,3 +1,0 @@
-proc			        /proc   proc    defaults        0	0
-192.168.64.1:/var/lib/scooby/agents/willow	/	nfs	defaults	0	0
-UUID="b357bda8-b641-41eb-9b5d-b3c5486e50e7"	/var/lib/rancher	ext4	defaults	0	0

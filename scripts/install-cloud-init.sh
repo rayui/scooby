@@ -2,9 +2,6 @@
 
 set -e
 
-touch /boot/meta-data
-touch /boot/user-data
-
 apt-get update
 apt-get install -y cloud-init
 
@@ -58,9 +55,24 @@ sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/
 sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
 
 #CREATE COMMON BOOT FILES
-touch /boot/ssh
-printf "#cloud-config\n# vim: syntax=yaml\n#\n" > /boot/meta-data
-printf "version: 2\nethernets:\n  eth0:\n    dhcp4: true\n" > /boot/network-config
+printf "" > /boot/ssh
+chmod a+x /boot/ssh
+printf "" > /boot/user-data
+chmod a+x /boot/user-data
+printf "\n
+network:\n
+  version: 2\n
+  ethernets:\n
+    eth0:\n
+      dhcp4: true\n
+" > /boot/meta-data
+chmod a+x /boot/meta-data
+printf "version: 2\n
+ethernets:\n
+  eth0:\n
+    dhcp4: true\n
+" > /boot/network-config
+chmod a+x /boot/network-config
 
 # Disable dhcpcd - it has a conflict with cloud-init network config
 systemctl mask dhcpcd

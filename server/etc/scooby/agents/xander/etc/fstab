@@ -1,0 +1,3 @@
+proc			        /proc   proc    defaults        0	0
+192.168.64.1:/mnt/scooby/agents/xander	/	nfs	defaults	0	0
+UUID="d5f9e6c2-493c-48da-baf2-0c63dd7a36b1"	/var/lib/rancher	ext4	defaults	0	0

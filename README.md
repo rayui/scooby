@@ -63,3 +63,4 @@ This project requires Vagrant. I use a self-hosted runner, which is more work to
 If you wish to use Github's own runners, you will need to edit `./github/workflows/build.yml` to use OSX as only it has Vagrant by default:
 
 `runs-on: macos-latest`
+

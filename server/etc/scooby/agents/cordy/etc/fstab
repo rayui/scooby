@@ -1,0 +1,3 @@
+proc			        /proc   proc    defaults        0	0
+192.168.64.1:/mnt/scooby/agents/cordy	/	nfs	defaults	0	0
+UUID="d6a6a961-f409-4897-96fb-c931fb1d54ee"	/var/lib/rancher	ext4	defaults	0	0

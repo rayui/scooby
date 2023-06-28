@@ -12,6 +12,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+    vb.memory = 8192
+    vb.cpus = 4
   end
 
   config.vm.provision "shell", inline: $script
