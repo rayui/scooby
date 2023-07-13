@@ -5,12 +5,16 @@ IMGNAME=agent-scooby.img
 IMGPATH=${IMGDIR}/${IMGNAME}
 BOOT_MNT=/mnt/boot
 ROOT_MNT=/mnt/root
+LOOP_DEV=/dev/loop0
+
+BASEPATH=/var/lib/scooby/base
 
 AGENTCONFIGPATH=/etc/scooby/agents
 AGENTINSTANCEPATH=/var/lib/scooby/agents
 AGENTSSHPATH=/var/lib/scooby/ssh
 AGENTMOUNTPATH=/mnt/scooby/agents
 RANCHERPATH=/var/lib/rancher
+OVERLAYWORKPATH=/tmp/overlay/work
 
 #source env vars in sh
 . /etc/scooby/.env
@@ -26,19 +30,31 @@ curl -o ${IMGPATH} ${LC_AGENT_IMAGE_HREF}
 
 #MOUNT IMAGE AS LOOP DEVICE
 losetup -Pf ${IMGPATH}
-mkdir -p ${BOOT_MNT}/boot
+mkdir -p ${BOOT_MNT}
 mkdir -p ${ROOT_MNT}
-mount /dev/loop0p1 ${BOOT_MNT}/boot
-mount /dev/loop0p2 ${ROOT_MNT}
+mount ${LOOP_DEV}p1 ${BOOT_MNT}
+mount ${LOOP_DEV}p2 ${ROOT_MNT}
+
+#COPY IMAGE INTO BASE
+mkdir -p ${BASEPATH}/boot
+rsync -xa --progress -r ${ROOT_MNT}/* ${BASEPATH}
+rsync -xa --progress -r ${BOOT_MNT}/* ${BASEPATH}/boot
 
 #copy bootcode.bin to /tftpboot
-rsync -xa --progress ${BOOT_MNT}/boot/bootcode.bin /tftpboot/
+rsync -xa --progress ${BOOT_MNT}/bootcode.bin /tftpboot/
 
-AGENTS=$(find ${AGENTINSTANCEPATH}/* -maxdepth 0 -type d -printf "%f\n")
+#UNMOUNT LOOP DEVICES
+umount ${BOOT_MNT}
+umount ${ROOT_MNT}
+losetup -D ${LOOP_DEV}
+
+AGENTS=$(find ${AGENTCONFIGPATH}/* -maxdepth 0 -type d -printf "%f\n")
 for AGENT in ${AGENTS}
 do
   echo "MOUNT AGENT UNION FS DIRECTORY"
-  mount -t unionfs -o rw,cow,dev,max_files=32768,allow_other,suid,use_ino,nonempty,dirs=${AGENTINSTANCEPATH}/${AGENT}=rw:${AGENTCONFIGPATH}/${AGENT}=ro:${ROOT_MNT}=ro:${BOOT_MNT}=ro none ${AGENTMOUNTPATH}/${AGENT}
+  mkdir -p ${OVERLAYWORKPATH}/${AGENT}
+  printf "${AGENT} ${AGENTMOUNTPATH}/${AGENT} overlay nfs_export=on,index=on,defaults,lowerdir=${AGENTCONFIGPATH}/${AGENT}:${BASEPATH},upperdir=${AGENTINSTANCEPATH}/${AGENT},workdir=${OVERLAYWORKPATH}/${AGENT} 0 0\n" >> /etc/fstab
+  mount ${AGENTMOUNTPATH}/${AGENT}
 
   #COPY BINARIES
   mkdir -p ${AGENTCONFIGPATH}/${AGENT}/usr/local/bin

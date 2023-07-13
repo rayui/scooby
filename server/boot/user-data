@@ -25,7 +25,6 @@ packages:
   - nfs-server
   - lighttpd
   - cloud-init
-  - unionfs-fuse
 
 users:
   - default
