@@ -8,12 +8,14 @@ ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 
 192.168.1.64 buffy
-192.168.1.64 prometheus.buffy
-192.168.1.64 grafana.buffy
-192.168.1.64 alerts.buffy
-192.168.1.64 resolv.buffy
-192.168.1.64 minecraft.buffy
-192.168.1.64 orbital.buffy
+# 192.168.1.65 taken by traefik?
+192.168.1.66 resolv.buffy
+192.168.1.67 prometheus.buffy
+192.168.1.68 grafana.buffy
+192.168.1.69 pihole.buffy
+192.168.1.70 tv.buffy
+192.168.1.71 minecraft.buffy
+192.168.1.72 orbital.buffy
 
 192.168.64.1 buffy.scooby
 192.168.64.64 willow

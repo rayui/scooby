@@ -28,21 +28,23 @@ spec:
     privileged: "true"
     serviceWeb:
       type: LoadBalancer
-      loadBalancerIP: 192.168.1.64
+      loadBalancerIP: 192.168.1.69
     serviceDhcp:
       enabled: false
     serviceDns:
       type: LoadBalancer
-      loadBalancerIP: 192.168.1.64
+      loadBalancerIP: 192.168.1.66
     dnsmasq:
       customDnsEntries:
       - address=/buffy/192.168.1.64
-      - address=/resolv.buffy/192.168.1.64
-      - address=/prometheus.buffy/192.168.1.64
-      - address=/grafana.buffy/192.168.1.64
-      - address=/alertmanager.buffy/192.168.1.64
-      - address=/minecraft.buffy/192.168.1.64
-      - address=/tv.buffy/192.168.1.64
+      # 192.168.1.65 taken by traefik?
+      - address=/resolv.buffy/192.168.1.66
+      - address=/prometheus.buffy/192.168.1.67
+      - address=/grafana.buffy/192.168.1.68
+      - address=/pihole.buffy/192.168.1.69
+      - address=/tv.buffy/192.168.1.70
+      - address=/minecraft.buffy/192.168.1.71
+      - address=/orbital.buffy/192.168.1.72
       - address=/serial/192.168.1.4
       - address=/chromecast-lounge/192.168.1.5
       - address=/hdmi/192.168.1.6
@@ -77,7 +79,7 @@ spec:
       PIHOLE_DOMAIN: "eastwood"
       DHCP_IPv6: "true"
       DHCP_rapid_commit: "true"
-      FTLCONF_LOCAL_IPV4: 192.168.1.64
+      #FTLCONF_LOCAL_IPV4: 192.168.1.66
     monitoring:
       podMonitor:
         enabled: true

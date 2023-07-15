@@ -61,20 +61,21 @@ spec:
       enabled: false
 
     grafana:
+      enabled: false
       # username is 'admin'
-      adminPassword: grafana
-      ingress:
-        enabled: true
-        annotations:
-          kubernetes.io/ingress.class: traefik
-        hosts: ['grafana.buffy']
-        path: "/"
-        tls:
-        - secretName: tls-credential
-          hosts:
-          - grafana.buffy
-      nodeSelector:
-        kubernetes.io/hostname: willow
+      # adminPassword: grafana
+      # ingress:
+      #   enabled: true
+      #   annotations:
+      #     kubernetes.io/ingress.class: traefik
+      #   hosts: ['grafana.buffy']
+      #   path: "/"
+      #   tls:
+      #   - secretName: tls-credential
+      #     hosts:
+      #     - grafana.buffy
+      # nodeSelector:
+      #   kubernetes.io/hostname: willow
 
     prometheusOperator:
       nodeSelector:

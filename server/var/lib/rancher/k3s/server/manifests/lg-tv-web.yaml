@@ -41,13 +41,14 @@ metadata:
   namespace: media
 spec:
   type: LoadBalancer
-  loadBalancerIP: 192.168.1.64
+  loadBalancerIP: 192.168.1.70
   selector:
     name: lg-tv-web-backend
   ports:
     - name: api
-      port: 3000
+      port: 80
       protocol: TCP
+      targetPort: 3000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -67,4 +68,4 @@ spec:
               service:
                 name: lg-tv-web-service
                 port:
-                  number: 3000
+                  number: 80

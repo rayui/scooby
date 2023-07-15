@@ -234,7 +234,7 @@ spec:
       # Set the external port of the service, usefull when using the LoadBalancer service type
       servicePort: 25565
       clusterIP:
-      loadBalancerIP: 192.168.1.64
+      loadBalancerIP: 192.168.1.71
       # loadBalancerSourceRanges: []
       ## Set the externalTrafficPolicy in the Service to either Cluster or Local
       # externalTrafficPolicy: Cluster

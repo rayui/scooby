@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prom-stack
+  labels:
+    name: traffic
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: grafana
+  namespace: prom-stack
+spec:
+  chart: grafana
+  targetNamespace: prom-stack
+  repo: https://grafana.github.io/helm-charts
+  valuesContent: |-
+    adminUser: admin
+    adminPassword: grafana
+    service:
+      type: LoadBalancer
+      loadBalancerIP: 192.168.1.68
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: prom-stack
+  annotations:
+    kubernetes.io/ingressClassName: traefik
+spec:
+  rules:
+    - host: grafana.buffy
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 80
