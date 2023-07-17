@@ -56,6 +56,9 @@ do
   printf "${AGENT} ${AGENTMOUNTPATH}/${AGENT} overlay nfs_export=on,index=on,defaults,lowerdir=${AGENTCONFIGPATH}/${AGENT}:${BASEPATH},upperdir=${AGENTINSTANCEPATH}/${AGENT},workdir=${OVERLAYWORKPATH}/${AGENT} 0 0\n" >> /etc/fstab
   mount ${AGENTMOUNTPATH}/${AGENT}
 
+  printf "dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 ip=dhcp root=/dev/nfs nfsroot=${LC_INTERNAL_IP}:/mnt/scooby/agents/${AGENT},tcp,vers=3 rw elevator=deadline rootwait ds=nocloud-net;s=http://${LC_INTERNAL_IP}:58087/cloud-config/${AGENT}/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" > ${AGENTCONFIGPATH}/${AGENT}/boot/cmdline.txt
+  printf "#cloud-config\n# vim: syntax=yaml\nhostname: ${AGENT}\nmanage_etc_hosts: true\npackage_update: false\npackage_upgrade: false\npackage_reboot_if_required: true\nusers:\n  - default\nruncmd:\n  - sh /usr/local/bin/finalize-cloud-init-agent.sh" > ${AGENTCONFIGPATH}/${AGENT}/boot/user-data
+
   #COPY BINARIES
   mkdir -p ${AGENTCONFIGPATH}/${AGENT}/usr/local/bin
   rsync -xa --progress -r /usr/local/bin/finalize-cloud-init-agent.sh ${AGENTCONFIGPATH}/${AGENT}/usr/local/bin/
