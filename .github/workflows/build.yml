@@ -35,8 +35,11 @@ jobs:
           LC_SSH_AUTH_KEY: ${{secrets.SSH_AUTH_KEY}}
           LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
           LC_PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
+      - name: Clone image
+        run: cp -v ./scooby.img ./scooby-agent.img
+        working-directory: images
       - name: Upload base agent image to S3
-        run: aws s3 cp ./scooby.img ${{secrets.AWS_BUCKET_S3_URI}}/scooby-agent-latest-arm64.img
+        run: aws s3 cp ./scooby-agent.img ${{secrets.AWS_BUCKET_S3_URI}}/scooby-agent-latest-arm64.img
         working-directory: images
         env:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_KEY_ID}}
