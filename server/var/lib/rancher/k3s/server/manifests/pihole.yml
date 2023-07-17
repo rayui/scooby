@@ -34,6 +34,7 @@ spec:
     serviceDns:
       type: LoadBalancer
       loadBalancerIP: 192.168.1.66
+      mixedService: true
     dnsmasq:
       customDnsEntries:
       - address=/buffy/192.168.1.64
