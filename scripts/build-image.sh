@@ -8,11 +8,6 @@ set -e
 
 export PACKER_GITHUB_API_TOKEN=${LC_PACKER_GITHUB_API_TOKEN}
 
-echo "LC_SSH_AUTH_KEY=${LC_SSH_AUTH_KEY}"
-echo "LC_IMAGE_HREF=${LC_IMAGE_HREF}"
-echo "LC_IMAGE_SHA=${LC_IMAGE_SHA}"
-echo "LC_DEFAULT_USER=${LC_DEFAULT_USER}"
-
 apt install -y rsync 
 
 packer init packer/

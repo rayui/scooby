@@ -40,10 +40,24 @@ Once you have cloned this project, you must create several Github Action environ
   - name of your default user
 - LC_EXTERNAL_IP
   - the public ip v4 address of your cluster
+- LC_EXTERNAL_NM
+  - network mask of your external nic
 - LC_INTERNAL_IP
   - the private ip v4 address of your cluster
+- LC_INTERNAL_NM
+  - network mask of your cluster nic
 - LC_INTERNAL_DEVICE
   - the internal device name for your cluster (e.g. eth1)
+- LC_EXTERNAL_DNS
+  - external DNS provider, e.g. 1.0.0.1
+- LC_EXTERNAL_DOMAIN
+  - domain on external nic - the domain of your lan
+- LC_EXTERNAL_GW
+
+  - public gateway of your lan
+
+- LC_LOCAL_DNS
+
 - PACKER_GITHUB_API_TOKEN
   - your Packer API token
 - SSH_AUTH_KEY
@@ -63,4 +77,3 @@ This project requires Vagrant. I use a self-hosted runner, which is more work to
 If you wish to use Github's own runners, you will need to edit `./github/workflows/build.yml` to use OSX as only it has Vagrant by default:
 
 `runs-on: macos-latest`
-
