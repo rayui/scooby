@@ -59,17 +59,7 @@ do
   mount ${AGENTMOUNTPATH}/${AGENT}
 
   #EXPORT THE AGENT FS
-  printf "/mnt/scooby/agents/${AGENT} willow(rw,sync,no_subtree_check,no_root_squash,fsid=${FSID})" >> /etc/exports
-
-  #CREATE AGENT NETWORK BOOT FILES
-  mkdir -p ${AGENTCONFIGPATH}/${AGENT}/boot/
-  printf "dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 ip=dhcp root=/dev/nfs nfsroot=${LC_INTERNAL_IP}:/mnt/scooby/agents/${AGENT},tcp,vers=3 rw elevator=deadline rootwait ds=nocloud-net;s=http://${LC_INTERNAL_IP}:58087/cloud-config/${AGENT}/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" > ${AGENTCONFIGPATH}/${AGENT}/boot/cmdline.txt
-  printf "#cloud-config\n# vim: syntax=yaml\nhostname: ${AGENT}\nmanage_etc_hosts: true\npackage_update: false\npackage_upgrade: false\npackage_reboot_if_required: true\nusers:\n  - default\nruncmd:\n  - sh /usr/local/bin/finalize-cloud-init-agent.sh" > ${AGENTCONFIGPATH}/${AGENT}/boot/user-data
-
-  #CREATE AGENT FSTAB
-  mkdir -p ${AGENTCONFIGPATH}/${AGENT}/etc/
-  AGENT_RANCHER_PART_UUID=$(cat ${AGENTCONFIGPATH}/${AGENT}/rancher_partition_uuid)
-  printf "proc /proc proc defaults 0 0\n${LC_INTERNAL_IP}:/mnt/scooby/agents/${AGENT} / nfs defaults 0 0\nUUID=\"${AGENT_RANCHER_PART_UUID}\" /var/lib/rancher ext4 defaults 0 0" > ${AGENTCONFIGPATH}/${AGENT}/etc/fstab
+  printf "\n/mnt/scooby/agents/${AGENT} ${AGENT}(rw,sync,no_subtree_check,no_root_squash,fsid=${FSID})" >> /etc/exports
 
   #SETUP AGENT TFTPBOOT
   ln -s ${AGENTMOUNTPATH}/${AGENT}/boot /tftpboot/$(cat ${AGENTCONFIGPATH}/${AGENT}/tftp_client_id)
@@ -78,18 +68,6 @@ do
   mkdir -p /var/www/html/cloud-config/${AGENT}
   ln -s ${AGENTMOUNTPATH}/${AGENT}/boot/user-data /var/www/html/cloud-config/${AGENT}
   ln -s ${AGENTMOUNTPATH}/${AGENT}/boot/meta-data /var/www/html/cloud-config/${AGENT}
-
-  # local mount point for rancher see here: https://github.com/containerd/containerd/issues/5464
-  mkdir -p ${AGENTCONFIGPATH}/${AGENT}${RANCHERPATH}
-
-  #COPY BINARIES
-  mkdir -p ${AGENTCONFIGPATH}/${AGENT}/usr/local/bin
-  rsync -xa --progress -r /usr/local/bin/finalize-cloud-init-agent.sh ${AGENTCONFIGPATH}/${AGENT}/usr/local/bin/
-
-  #COPY AGENT KEYS FOR K3S
-  mkdir -p ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHPATH}/
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHPATH}/${LC_DEFAULT_USER}_ed25519_key.pub
 
   FSID=$((FSID+1))
 done

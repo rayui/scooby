@@ -42,22 +42,22 @@ Once you have cloned this project, you must create several Github Action environ
   - the public ip v4 address of your cluster
 - LC_EXTERNAL_NM
   - network mask of your external nic
+- LC_EXTERNAL_DNS
+  - external DNS provider, e.g. 1.0.0.1
+- LC_EXTERNAL_DOMAIN
+  - domain on external nic - the domain of your lan
+- LC_EXTERNAL_GW
+  - public gateway of your lan
+- LC_LOCAL_DNS
+  - local dns provider, e.g 192.168.1.66
 - LC_INTERNAL_IP
   - the private ip v4 address of your cluster
 - LC_INTERNAL_NM
   - network mask of your cluster nic
 - LC_INTERNAL_DEVICE
   - the internal device name for your cluster (e.g. eth1)
-- LC_EXTERNAL_DNS
-  - external DNS provider, e.g. 1.0.0.1
-- LC_EXTERNAL_DOMAIN
-  - domain on external nic - the domain of your lan
-- LC_EXTERNAL_GW
-
-  - public gateway of your lan
-
-- LC_LOCAL_DNS
-
+- LC_INTERNAL_DOMAIN
+  - the internal domain name of your cluster, (e.g. sunnydale)
 - PACKER_GITHUB_API_TOKEN
   - your Packer API token
 - SSH_AUTH_KEY
