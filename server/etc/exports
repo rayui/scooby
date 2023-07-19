@@ -1,4 +1,0 @@
-/mnt/scooby/agents/willow		willow(rw,sync,no_subtree_check,no_root_squash,fsid=1)
-/mnt/scooby/agents/xander		xander(rw,sync,no_subtree_check,no_root_squash,fsid=2)
-/mnt/scooby/agents/cordy		cordy(rw,sync,no_subtree_check,no_root_squash,fsid=3)
-/mnt/scooby/agents/giles		giles(rw,sync,no_subtree_check,no_root_squash,fsid=4)

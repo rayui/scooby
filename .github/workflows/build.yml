@@ -58,10 +58,18 @@ jobs:
         env:
           LC_ALL: en_US.UTF-8
           LC_EXTERNAL_IP: ${{secrets.LC_EXTERNAL_IP}}
-          LC_INTERNAL_IP: ${{secrets.LC_INTERNAL_IP}}
+          LC_EXTERNAL_NM: ${{secrets.LC_EXTERNAL_NM}}
+          LC_EXTERNAL_GW: ${{secrets.LC_EXTERNAL_GW}}
+          LC_EXTERNAL_DOMAIN: ${{secrets.LC_EXTERNAL_DOMAIN}}
+          LC_EXTERNAL_DNS: ${{secrets.LC_EXTERNAL_DNS}}
+          LC_LOCAL_DNS: ${{secrets.LC_LOCAL_DNS}}
           LC_INTERNAL_DEVICE: ${{secrets.LC_INTERNAL_DEVICE}}
+          LC_INTERNAL_IP: ${{secrets.LC_INTERNAL_IP}}
+          LC_INTERNAL_NM: ${{secrets.LC_INTERNAL_NM}}
+          LC_INTERNAL_DOMAIN: ${{secrets.LC_INTERNAL_DOMAIN}}
           LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
           LC_AGENT_IMAGE_HREF: ${{ steps.create_agent_href.outputs.LC_AGENT_IMAGE_HREF }}
+
       - name: Upload server image to S3
         id: create_server_href
         run: aws s3 cp ./scooby.img ${{secrets.AWS_BUCKET_S3_URI}}/scooby-latest-arm64.img
