@@ -36,6 +36,10 @@ spec:
       loadBalancerIP: 192.168.1.66
       mixedService: true
     dnsmasq:
+      customSettings:
+      - dhcp-range=tag:eth0,192.168.1.128,192.168.1.240
+      - dhcp-option=tag:eth0,option:router,192.168.1.1
+      - dhcp-option=tag:eth0,6,192.168.1.66
       customDnsEntries:
       - address=/buffy/192.168.1.64
       # 192.168.1.65 taken by traefik?
@@ -46,7 +50,6 @@ spec:
       - address=/tv.buffy/192.168.1.70
       - address=/minecraft.buffy/192.168.1.71
       - address=/orbital.buffy/192.168.1.72
-      - address=/serial/192.168.1.4
       - address=/chromecast-lounge/192.168.1.5
       - address=/hdmi/192.168.1.6
       - address=/chromecast-bedroom/192.168.1.7
@@ -84,3 +87,19 @@ spec:
     monitoring:
       podMonitor:
         enabled: true
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dhcp-relay
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dhcp-relay
+  namespace: dhcp-relay
+data:
+  external_nic: "eth0"
+  kubernetes_nic: "cni0"
+  #this needs to be resolvable to the traefik service
+  pihole_udp_service_ip: "192.168.1.66"
