@@ -65,11 +65,6 @@ printf "network:
     eth0:
       dhcp4: true" > /boot/meta-data
 chmod a+x /boot/meta-data
-printf "version: 2
-ethernets:
-  eth0:
-    dhcp4: true" > /boot/network-config
-chmod a+x /boot/network-config
 
 # Disable dhcpcd - it has a conflict with cloud-init network config
 systemctl mask dhcpcd

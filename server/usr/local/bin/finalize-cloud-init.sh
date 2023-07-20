@@ -3,18 +3,13 @@
 IMGDIR=/var/lib/scooby/images
 IMGNAME=agent-scooby.img
 IMGPATH=${IMGDIR}/${IMGNAME}
+BASEPATH=/var/lib/scooby/base
 BOOT_MNT=/mnt/boot
 ROOT_MNT=/mnt/root
 LOOP_DEV=/dev/loop0
-
-BASEPATH=/var/lib/scooby/base
-
 AGENTCONFIGPATH=/etc/scooby/agents
-AGENTINSTANCEPATH=/var/lib/scooby/agents
-AGENTSSHPATH=/var/lib/scooby/ssh
 AGENTMOUNTPATH=/mnt/scooby/agents
-RANCHERPATH=/var/lib/rancher
-OVERLAYWORKPATH=/tmp/overlay/work
+AGENTSSHBASE=/var/lib/scooby/ssh
 
 #source env vars in sh
 . /etc/scooby/.env
@@ -23,6 +18,19 @@ OVERLAYWORKPATH=/tmp/overlay/work
 ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
 cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub >> /home/${LC_DEFAULT_USER}/.ssh/authorized_keys
 chown -R ${LC_DEFAULT_USER}:${LC_DEFAULT_USER} /home/${LC_DEFAULT_USER}/.ssh/
+
+AGENTS=$(find ${AGENTCONFIGPATH}/* -maxdepth 0 -type d -printf "%f\n")
+FSID=1
+for AGENT in ${AGENTS}
+do
+  ### COPY AGENT KEYS FOR K3S
+  mkdir -p ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHBASE}/
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHBASE}
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHBASE}
+  cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${AGENTCONFIGPATH}/${AGENT}${AGENTSSHBASE}/authorized_keys
+
+  FSID=$((FSID+1))
+done
 
 #GET AGENT IMAGE FROM AWS
 mkdir -p ${IMGDIR}
@@ -48,34 +56,14 @@ umount ${BOOT_MNT}
 umount ${ROOT_MNT}
 losetup -D ${LOOP_DEV}
 
-AGENTS=$(find ${AGENTCONFIGPATH}/* -maxdepth 0 -type d -printf "%f\n")
-FSID=1
+#REMOUNT OVERLAYFS
+umount ${AGENTMOUNTPATH}/*
+mount -a
 
-for AGENT in ${AGENTS}
-do
-  #UPDATE MASTER FSTAB
-  mkdir -p ${OVERLAYWORKPATH}/${AGENT}
-  printf "${AGENT} ${AGENTMOUNTPATH}/${AGENT} overlay nfs_export=on,index=on,defaults,lowerdir=${AGENTCONFIGPATH}/${AGENT}:${BASEPATH},upperdir=${AGENTINSTANCEPATH}/${AGENT},workdir=${OVERLAYWORKPATH}/${AGENT} 0 0\n" >> /etc/fstab
-  mount ${AGENTMOUNTPATH}/${AGENT}
-
-  #EXPORT THE AGENT FS
-  printf "\n/mnt/scooby/agents/${AGENT} ${AGENT}(rw,sync,no_subtree_check,no_root_squash,fsid=${FSID})" >> /etc/exports
-
-  #SETUP AGENT TFTPBOOT
-  ln -s ${AGENTMOUNTPATH}/${AGENT}/boot /tftpboot/$(cat ${AGENTCONFIGPATH}/${AGENT}/tftp_client_id)
-
-  #LINK AGENT CLOUD BOOT CONFIG
-  mkdir -p /var/www/html/cloud-config/${AGENT}
-  ln -s ${AGENTMOUNTPATH}/${AGENT}/boot/user-data /var/www/html/cloud-config/${AGENT}
-  ln -s ${AGENTMOUNTPATH}/${AGENT}/boot/meta-data /var/www/html/cloud-config/${AGENT}
-
-  FSID=$((FSID+1))
-done
-
+#REEXPORT NFS
 exportfs -a
 
 #K3S
-
 cd /tmp && curl -sLS https://get.k3sup.dev | sh
 # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327
 k3sup install --ip ${LC_INTERNAL_IP} --user ${LC_DEFAULT_USER} --ssh-key "/home/${LC_DEFAULT_USER}/.ssh/id_ed25519" --k3s-extra-args "--node-external-ip=${LC_EXTERNAL_IP} --flannel-iface='${LC_INTERNAL_DEVICE}' --kube-apiserver-arg 'service-node-port-range=1000-32767'"
