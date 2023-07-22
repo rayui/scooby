@@ -59,11 +59,14 @@ printf "" > /boot/ssh
 chmod a+x /boot/ssh
 printf "" > /boot/user-data
 chmod a+x /boot/user-data
-printf "network:
+
+cat - > /boot/meta-data << EOF
+network:
   version: 2
   ethernets:
-    eth0:
-      dhcp4: true" > /boot/meta-data
+    ${LC_EXETRNAL_DEVICE}:
+      dhcp4: true
+EOF
 chmod a+x /boot/meta-data
 
 # Disable dhcpcd - it has a conflict with cloud-init network config

@@ -38,6 +38,8 @@ Once you have cloned this project, you must create several Github Action environ
   - your AWS bucket region
 - LC_DEFAULT_USER
   - name of your default user
+- LC_EXTERNAL_DEVICE
+  - your external facing device (e.g. eth0)
 - LC_EXTERNAL_IP
   - the public ip v4 address of your cluster
 - LC_EXTERNAL_NM

@@ -54,7 +54,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_REGION: ${{secrets.AWS_REGION}}
       - name: Configure server image
-        run: vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_IP,LC_INTERNAL_IP,LC_INTERNAL_DEVICE,LC_DEFAULT_USER,LC_AGENT_IMAGE_HREF ./scripts/configure-image.sh"
+        run: vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_DEVICE,LC_EXTERNAL_IP,LC_INTERNAL_IP,LC_INTERNAL_DEVICE,LC_DEFAULT_USER,LC_AGENT_IMAGE_HREF ./scripts/configure-image.sh"
         env:
           LC_ALL: en_US.UTF-8
           LC_EXTERNAL_IP: ${{secrets.LC_EXTERNAL_IP}}
@@ -62,6 +62,7 @@ jobs:
           LC_EXTERNAL_GW: ${{secrets.LC_EXTERNAL_GW}}
           LC_EXTERNAL_DOMAIN: ${{secrets.LC_EXTERNAL_DOMAIN}}
           LC_EXTERNAL_DNS: ${{secrets.LC_EXTERNAL_DNS}}
+          LC_EXTERNAL_DEVICE: ${{secrets.LC_EXTERNAL_DEVICE}}
           LC_LOCAL_DNS: ${{secrets.LC_LOCAL_DNS}}
           LC_INTERNAL_DEVICE: ${{secrets.LC_INTERNAL_DEVICE}}
           LC_INTERNAL_IP: ${{secrets.LC_INTERNAL_IP}}
