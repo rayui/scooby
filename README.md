@@ -31,19 +31,19 @@ Once you have cloned this project, you must create several Github Action environ
 - AWS_BUCKET_S3_URI
   - the S3 URI bucket for generated images
 - AWS_KEY_ID
-  - your AWS key ID
+  - your AWS key ID to the S3 bucket
 - AWS_SECRET_ACCESS_KEY
-  - you AWS secret access key
+  - your AWS secret access key to the S3 bucket
 - AWS_REGION
-  - your AWS bucket region
+  - your AWS S3 bucket region
 - LC_DEFAULT_USER
-  - name of your default user
+  - name of your default user for the cluster
 - LC_EXTERNAL_DEVICE
   - your external facing device (e.g. eth0)
 - LC_EXTERNAL_IP
   - the public ip v4 address of your cluster
 - LC_EXTERNAL_NM
-  - network mask of your external nic
+  - network mask of your external nic, e.g. 24
 - LC_EXTERNAL_DNS
   - external DNS provider, e.g. 1.0.0.1
 - LC_EXTERNAL_DOMAIN
@@ -55,7 +55,7 @@ Once you have cloned this project, you must create several Github Action environ
 - LC_INTERNAL_IP
   - the private ip v4 address of your cluster
 - LC_INTERNAL_NM
-  - network mask of your cluster nic
+  - network mask of your cluster nic, e.g. 24
 - LC_INTERNAL_DEVICE
   - the internal device name for your cluster (e.g. eth1)
 - LC_INTERNAL_DOMAIN
@@ -63,7 +63,7 @@ Once you have cloned this project, you must create several Github Action environ
 - PACKER_GITHUB_API_TOKEN
   - your Packer API token
 - SSH_AUTH_KEY
-  - your public SSH key to access the cluster
+  - your SSH auth key to access the cluster
 
 #### Variables
 
@@ -71,6 +71,25 @@ Once you have cloned this project, you must create several Github Action environ
   - the HREF to your base image
 - LC_IMAGE_SHA
   - the SHA for your base image
+
+### Server config
+
+Any files placed in the /server directory will be copied into the image as static assets. They are persistent and available on first boot.
+
+`/server/usr/local/bin/finalize-cloud-init.sh` and `/server/usr/local/bin/finalize-cloud-init-agent.sh` are first-boot configuration scripts for server and agents, respectively.
+
+Kubernetes manifests should go in `/server/var/lib/k3s/server/manifests`
+
+Also included is a udev script to reset 8152 USB network interfaces and an example dnsmasq dhcp service.
+
+### Agent config
+
+The server configuration step will create one agent instance for each directory in /server/etc/scooby/agents/{hostname}. Each agent directory must have the following files with contents as described:
+
+- ethernet - the mac address of the pi
+- ip - the ipv4 address of the pi
+- rancher_partition_uuid - partition uuid of pi local storage, e.g. usb stick
+- tftp_client_id - the tftp id of the client. on the agent: `cat /sys/firmware/devicetree/base/serial-number`
 
 ### Vagrant
 
