@@ -41,15 +41,8 @@ spec:
       - dhcp-option=tag:eth0,option:router,192.168.1.1
       - dhcp-option=tag:eth0,6,192.168.1.66
       customDnsEntries:
-      - address=/buffy/192.168.1.64
-      # 192.168.1.65 taken by traefik?
-      - address=/resolv.buffy/192.168.1.66
-      - address=/prometheus.buffy/192.168.1.67
-      - address=/grafana.buffy/192.168.1.68
-      - address=/pihole.buffy/192.168.1.69
-      - address=/tv.buffy/192.168.1.70
-      - address=/minecraft.buffy/192.168.1.71
-      - address=/orbital.buffy/192.168.1.72
+      # STATIC HOSTS
+      - address=/router/192.168.1.1
       - address=/chromecast-lounge/192.168.1.5
       - address=/hdmi/192.168.1.6
       - address=/chromecast-bedroom/192.168.1.7
@@ -62,6 +55,16 @@ spec:
       - address=/unifi-1/192.168.1.252
       - address=/unifi-0/192.168.1.253
       - address=/netgear-sw-0/192.168.1.254
+      # K3S SERVICES
+      - address=/buffy/192.168.1.64
+      # 192.168.1.65 taken by traefik?
+      - address=/resolv.buffy/192.168.1.66
+      - address=/prometheus.buffy/192.168.1.67
+      - address=/grafana.buffy/192.168.1.68
+      - address=/pihole.buffy/192.168.1.69
+      - address=/tv.buffy/192.168.1.70
+      - address=/minecraft.buffy/192.168.1.71
+      - address=/orbital.buffy/192.168.1.72
     podDnsConfig:
       enabled: false
       policy: "None"
