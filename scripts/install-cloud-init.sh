@@ -5,7 +5,7 @@ set -e
 apt-get update
 apt-get install -y cloud-init
 
-echo "INSTALLED PACKAGES"
+printf "INSTALLED PACKAGES\n"
 
 cat - > /etc/cloud/templates/sources.list.debian.tmpl <<'EOF'
 ## template:jinja
@@ -55,16 +55,19 @@ sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/
 sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
 
 #CREATE COMMON BOOT FILES
-printf "" > /boot/ssh
+cat - > /boot/ssh << EOF
+EOF
 chmod a+x /boot/ssh
-printf "" > /boot/user-data
+
+cat - > /boot/user-data << EOF
+EOF
 chmod a+x /boot/user-data
 
 cat - > /boot/meta-data << EOF
 network:
   version: 2
   ethernets:
-    ${LC_EXETRNAL_DEVICE}:
+    ${LC_EXTERNAL_DEVICE}:
       dhcp4: true
 EOF
 chmod a+x /boot/meta-data

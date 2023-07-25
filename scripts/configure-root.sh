@@ -1,9 +1,43 @@
 #!/bin/sh
 
+importAgentImage() {
+  LOOP_DEV2=/dev/loop1
+  BOOT_MNT=/tmp/boot
+  ROOT_MNT=/tmp/root
+  AGENT_BOOT_MNT=/tmp/agent-boot
+  AGENT_ROOT_MNT=/tmp/agent-root
+  SCOOBY_DIR=/var/lib/scooby
+  AGENTPATH=${ROOT_MNT}${SCOOBY_DIR}/base
+  
+  #MOUNT IMAGE AS LOOP DEVICE
+  losetup -Pf ${VAGRANT}/images/scooby-agent.img
+  mkdir -p ${BOOT_MNT}
+  mkdir -p ${ROOT_MNT}
+  mkdir -p ${AGENT_BOOT_MNT}
+  mkdir -p ${AGENT_ROOT_MNT}
+  mount ${LOOP_DEV}p2 ${ROOT_MNT}
+  mount ${LOOP_DEV2}p1 ${AGENT_BOOT_MNT}
+  mount ${LOOP_DEV2}p2 ${AGENT_ROOT_MNT}
+
+  #COPY IMAGE INTO BASE
+  mkdir -p ${AGENTPATH}/boot
+  rsync -xa --progress -r ${AGENT_ROOT_MNT}/* ${AGENTPATH}
+  rsync -xa --progress -r ${AGENT_BOOT_MNT}/* ${AGENTPATH}/boot
+
+  #PUT BOOTCODE.BIN IN TFTPBOOT
+  rsync -xa --progress ${AGENT_BOOT_MNT}/bootcode.bin ${ROOT_MNT}/tftpboot/
+
+  #UNMOUNT LOOP DEVICES
+  umount ${AGENT_BOOT_MNT}
+  umount ${AGENT_ROOT_MNT}
+  umount ${ROOT_MNT}
+}
+
 configureRoot() {
 
 ROOT_MNT=/tmp/root
 SCOOBY_DIR=/var/lib/scooby
+IMAGEBASE=${SCOOBY_DIR}/images
 AGENTBASE=${SCOOBY_DIR}/base
 AGENTSSHBASE=${SCOOBY_DIR}/ssh
 
@@ -15,7 +49,7 @@ mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
 ### COPY STATIC CONFIG
 rsync -x --progress -r ${VAGRANT}/server/* ${ROOT_MNT}
-echo "COPIED STATIC CONFIG"
+printf "COPIED STATIC CONFIG\n"
 
 ### BASE SERVICES CONFIG
 ## INTERNAL DNSMASQ
@@ -29,7 +63,7 @@ log-dhcp
 EOF
 
 #ASSUME CLASS C NETWORK FOR NOW
-INTERNAL_NET=$(echo ${LC_INTERNAL_IP} | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}')
+INTERNAL_NET=$(printf "${LC_INTERNAL_IP}" | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}')
 
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/10-scooby-dhcp.conf << EOF
 domain=${LC_INTERNAL_DOMAIN}
@@ -136,37 +170,6 @@ do
   cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${AGENT_CONFIG_DIR}/\${AGENT}${AGENTSSHBASE}/authorized_keys
 done
 
-#GET AGENT IMAGE FROM AWS
-mkdir -p ${SCOOBY_DIR}/images
-curl -o ${SCOOBY_DIR}/images/agent-scooby.img "${LC_AGENT_IMAGE_HREF}"
-
-#MOUNT IMAGE AS LOOP DEVICE
-losetup -Pf ${SCOOBY_DIR}/images/agent-scooby.img
-mkdir -p \${BOOT_MNT_LOCAL}
-mkdir -p \${ROOT_MNT_LOCAL}
-mount ${LOOP_DEV}p1 \${BOOT_MNT_LOCAL}
-mount ${LOOP_DEV}p2 \${ROOT_MNT_LOCAL}
-
-#COPY IMAGE INTO BASE
-mkdir -p ${AGENTBASE}/boot
-rsync -xa --progress -r \${ROOT_MNT_LOCAL}/* ${AGENTBASE}
-rsync -xa --progress -r \${BOOT_MNT_LOCAL}/* ${AGENTBASE}/boot
-
-#copy bootcode.bin to /tftpboot
-rsync -xa --progress \${BOOT_MNT_LOCAL}/bootcode.bin /tftpboot/
-
-#UNMOUNT LOOP DEVICES
-umount \${BOOT_MNT_LOCAL}
-umount \${ROOT_MNT_LOCAL}
-losetup -D ${LOOP_DEV}
-
-#REMOUNT OVERLAYFS
-umount ${AGENTMOUNTBASE}/*
-mount -a
-
-#REEXPORT NFS
-exportfs -a
-
 #K3S
 cd /tmp && curl -sLS https://get.k3sup.dev | sh
 # https://github.com/k3s-io/k3s/issues/535#issuecomment-863188327
@@ -180,17 +183,15 @@ wall "BUFFY WILL PATROL TONIGHT"
 EOF
 chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
 
-#CREATE TFTPBOOT DIRECTORY
-
-mkdir -p ${ROOT_MNT}/tftpboot
-echo "CREATED TFTP ROOT"
-
-#CREATE AGENT BASE IMAGE FOR MOUNT
-mkdir -p ${ROOT_MNT}${AGENTBASE}/boot
-
 ### AGENT CONFIG
 mkdir -p ${ROOT_MNT}${AGENT_CONFIG_DIR}
+
+#CREATE TFTPBOOT DIRECTORY
+mkdir -p ${ROOT_MNT}/tftpboot
 
 umount ${ROOT_MNT}
 
 }
+
+
+

@@ -1,23 +1,21 @@
 #!/bin/sh
 
-VAGRANT=/vagrant
-IMGDIR=${VAGRANT}/images
-IMGNAME=scooby.img
+VARS="./.env"
 
-set -e
+#load local variables if available
+[ -f "${VARS}" ] && . ${VARS}
 
-export PACKER_GITHUB_API_TOKEN=${LC_PACKER_GITHUB_API_TOKEN}
+printf "BRING UP VIRTUAL BUILD HOST\n"
+vagrant box update
+vagrant plugin install vagrant-vbguest
+vagrant up
 
-apt install -y rsync 
+printf "CREATE BASE IMAGE\n"
+vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_IMAGE_HREF,LC_IMAGE_SHA,LC_DEFAULT_USER,LC_SSH_AUTH_KEY,LC_PACKER_GITHUB_API_TOKEN ./scripts/create-image.sh"
+dd if=./images/scooby.img of=./images/scooby-agent.img bs=1M status=progress
 
-packer init packer/
-packer build \
-  -var "ssh_auth_key=${LC_SSH_AUTH_KEY}" \
-  -var "image_href=${LC_IMAGE_HREF}" \
-  -var "image_sha=${LC_IMAGE_SHA}" \
-  -var "default_user=${LC_DEFAULT_USER}" \
-  -var "external_device=${LC_EXTERNAL_DEVICE}" \
-  -parallel-builds=1 packer/
+printf "CREATE SERVER IMAGE\n"
+vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_DEVICE,LC_EXTERNAL_IP,LC_INTERNAL_IP,LC_INTERNAL_DEVICE,LC_DEFAULT_USER ./scripts/configure-image.sh"
 
-#MAKE BOOTABLE
-sfdisk -A -N 1 ${IMGDIR}/${IMGNAME}
+printf "DESTROY VIRTUAL BUILD HOST\n"
+vagrant destroy --force --no-tty
