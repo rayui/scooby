@@ -1,49 +1,34 @@
 #!/bin/sh
 
 importAgentImage() {
-  LOOP_DEV2=/dev/loop1
-  BOOT_MNT=/tmp/boot
-  ROOT_MNT=/tmp/root
-  AGENT_BOOT_MNT=/tmp/agent-boot
-  AGENT_ROOT_MNT=/tmp/agent-root
-  SCOOBY_DIR=/var/lib/scooby
-  AGENTPATH=${ROOT_MNT}${SCOOBY_DIR}/base
-  
+  TMP_BOOT=/tmp/agent-boot
+  TMP_ROOT=/tmp/agent-root
+
   #MOUNT IMAGE AS LOOP DEVICE
   losetup -Pf ${VAGRANT}/images/scooby-agent.img
   mkdir -p ${BOOT_MNT}
   mkdir -p ${ROOT_MNT}
-  mkdir -p ${AGENT_BOOT_MNT}
-  mkdir -p ${AGENT_ROOT_MNT}
+  mkdir -p ${TMP_BOOT}
+  mkdir -p ${TMP_ROOT}
   mount ${LOOP_DEV}p2 ${ROOT_MNT}
-  mount ${LOOP_DEV2}p1 ${AGENT_BOOT_MNT}
-  mount ${LOOP_DEV2}p2 ${AGENT_ROOT_MNT}
+  mount ${LOOP_DEV2}p1 ${TMP_BOOT}
+  mount ${LOOP_DEV2}p2 ${TMP_ROOT}
 
   #COPY IMAGE INTO BASE
-  mkdir -p ${AGENTPATH}/boot
-  rsync -xa --progress -r ${AGENT_ROOT_MNT}/* ${AGENTPATH}
-  rsync -xa --progress -r ${AGENT_BOOT_MNT}/* ${AGENTPATH}/boot
+  mkdir -p ${ROOT_MNT}${BASE_DIR}/boot
+  rsync -xa --progress -r ${TMP_ROOT}/* ${ROOT_MNT}${BASE_DIR}
+  rsync -xa --progress -r ${TMP_BOOT}/* ${ROOT_MNT}${BASE_DIR}/boot
 
   #PUT BOOTCODE.BIN IN TFTPBOOT
-  rsync -xa --progress ${AGENT_BOOT_MNT}/bootcode.bin ${ROOT_MNT}/tftpboot/
+  rsync -xa --progress ${TMP_BOOT}/bootcode.bin ${ROOT_MNT}/tftpboot/
 
   #UNMOUNT LOOP DEVICES
-  umount ${AGENT_BOOT_MNT}
-  umount ${AGENT_ROOT_MNT}
+  umount ${TMP_BOOT}
+  umount ${TMP_ROOT}
   umount ${ROOT_MNT}
 }
 
 configureRoot() {
-
-ROOT_MNT=/tmp/root
-SCOOBY_DIR=/var/lib/scooby
-IMAGEBASE=${SCOOBY_DIR}/images
-AGENTBASE=${SCOOBY_DIR}/base
-AGENTSSHBASE=${SCOOBY_DIR}/ssh
-
-AGENT_CONFIG_DIR=/etc/scooby/agents
-AGENTMOUNTBASE=/mnt/scooby/agents
-
 mkdir -p ${ROOT_MNT}
 mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
@@ -62,14 +47,11 @@ expand-hosts
 log-dhcp
 EOF
 
-#ASSUME CLASS C NETWORK FOR NOW
-INTERNAL_NET=$(printf "${LC_INTERNAL_IP}" | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}')
-
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/10-scooby-dhcp.conf << EOF
 domain=${LC_INTERNAL_DOMAIN}
 interface=${LC_INTERNAL_DEVICE}
 
-dhcp-range=tag:${LC_INTERNAL_DEVICE},${INTERNAL_NET}0,static
+dhcp-range=tag:${LC_INTERNAL_DEVICE},${INTERNAL_NET},static
 dhcp-option=tag:${LC_INTERNAL_DEVICE},66,${LC_INTERNAL_IP}
 dhcp-option=tag:${LC_INTERNAL_DEVICE},option:router,${LC_INTERNAL_IP}
 dhcp-option=tag:${LC_INTERNAL_DEVICE},6,${LC_EXTERNAL_DNS}
@@ -145,7 +127,7 @@ EOF
 
 ### HOSTS
 cat - >> ${ROOT_MNT}/etc/hosts << EOF
-  ${LC_INTERNAL_IP} ${MASTER_HOSTNAME}
+  ${LC_INTERNAL_IP} ${LC_HOSTNAME}
 EOF
 
 ### FIRST BOOT CONFIGURATION
@@ -161,13 +143,13 @@ ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
 cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub >> /home/${LC_DEFAULT_USER}/.ssh/authorized_keys
 chown -R ${LC_DEFAULT_USER}:${LC_DEFAULT_USER} /home/${LC_DEFAULT_USER}/.ssh/
 
-for AGENT in \$(cd ${AGENT_CONFIG_DIR}; ls -d *)
+for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
 do
   ### COPY AGENT KEYS FOR K3S
-  mkdir -p ${AGENT_CONFIG_DIR}/\${AGENT}${AGENTSSHBASE}/
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${AGENT_CONFIG_DIR}/\${AGENT}${AGENTSSHBASE}
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${AGENT_CONFIG_DIR}/\${AGENT}${AGENTSSHBASE}
-  cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${AGENT_CONFIG_DIR}/\${AGENT}${AGENTSSHBASE}/authorized_keys
+  mkdir -p ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/authorized_keys
 done
 
 #K3S
@@ -184,7 +166,7 @@ EOF
 chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
 
 ### AGENT CONFIG
-mkdir -p ${ROOT_MNT}${AGENT_CONFIG_DIR}
+mkdir -p ${ROOT_MNT}${CONFIG_DIR}
 
 #CREATE TFTPBOOT DIRECTORY
 mkdir -p ${ROOT_MNT}/tftpboot

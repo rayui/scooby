@@ -2,8 +2,6 @@
 
 configureBoot() {
 
-BOOT_MNT=/tmp/boot
-
 mkdir -p ${BOOT_MNT}
 mount ${LOOP_DEV}p1 ${BOOT_MNT}
 
@@ -14,7 +12,7 @@ ethernets:
   ${LC_EXTERNAL_DEVICE}:
     dhcp4: false
     addresses:
-    - ${LC_EXTERNAL_IP}/${LC_EXTERNAL_NM}
+    - ${LC_EXTERNAL_IP}/${EXTERNAL_MASK}
     gateway4: ${LC_EXTERNAL_GW}
     nameservers:
       search: [${LC_EXTERNAL_DOMAIN}]
@@ -23,7 +21,7 @@ ethernets:
     dhcp4: false
     gateway4: ${LC_EXTERNAL_IP}
     addresses:
-    - ${LC_INTERNAL_IP}/${LC_INTERNAL_NM}
+    - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
     nameservers:
       search: [${LC_INTERNAL_DOMAIN}]
       addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
@@ -37,7 +35,7 @@ network:
     ${LC_EXTERNAL_DEVICE}:
       dhcp4: false
       addresses:
-      - ${LC_EXTERNAL_IP}/${LC_EXTERNAL_NM}
+      - ${LC_EXTERNAL_IP}/${EXTERNAL_MASK}
       gateway4: ${LC_EXTERNAL_GW}
       nameservers:
         search: [${LC_EXTERNAL_DOMAIN}]
@@ -46,7 +44,7 @@ network:
       dhcp4: false
       gateway4: ${LC_EXTERNAL_IP}
       addresses:
-      - ${LC_INTERNAL_IP}/${LC_INTERNAL_NM}
+      - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
       nameservers:
         search: [${LC_INTERNAL_DOMAIN}]
         addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
@@ -56,7 +54,7 @@ chmod a+x ${BOOT_MNT}/meta-data
 cat - > ${BOOT_MNT}/user-data << EOF
 #cloud-config
 # vim: syntax=yaml
-hostname: ${MASTER_HOSTNAME}
+hostname: ${LC_HOSTNAME}
 manage_etc_hosts: false
 packages:
   - vim

@@ -1,7 +1,6 @@
 #!/bin/sh
 
-VAGRANT=/vagrant
-IMAGEPATH=${VAGRANT}/images/scooby.img
+VAGRANT_IMAGE=/vagrant/images/scooby.img
 
 set -e
 
@@ -19,4 +18,4 @@ packer build \
   -parallel-builds=1 packer/
 
   #MAKE BOOTABLE
-  sfdisk -A -N 1 ${IMAGEPATH}
+  sfdisk -A -N 1 ${VAGRANT_IMAGE}

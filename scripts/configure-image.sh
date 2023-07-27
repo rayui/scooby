@@ -1,16 +1,31 @@
-MASTER_HOSTNAME=buffy
-VAGRANT=/vagrant
-LOOP_DEV=/dev/loop0
-IMAGEPATH=${VAGRANT}/images/scooby.img
+#!/bin/sh
 
 . ./scripts/resize-image.sh
 . ./scripts/configure-boot.sh
 . ./scripts/configure-root.sh
 . ./scripts/configure-agent.sh
 
+VAGRANT=/vagrant
+VAGRANT_IMAGE=${VAGRANT}/images/scooby.img
+
+LOOP_DEV=/dev/loop0
+LOOP_DEV2=/dev/loop1
+BOOT_MNT=/tmp/boot
+ROOT_MNT=/tmp/root
+
+SCOOBY_DIR=/var/lib/scooby
+BASE_DIR=${SCOOBY_DIR}/base
+SSH_DIR=${SCOOBY_DIR}/ssh
+CONFIG_DIR=/etc/scooby/agents
+MOUNT_DIR=/mnt/scooby/agents
+
+INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
+INTERNAL_MASK=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $2}')
+EXTERNAL_MASK=$(printf "${LC_EXTERNAL_NET}" | awk -F/ '{print $2}')
+
 resizeImage
 
-losetup -Pf ${IMAGEPATH}
+losetup -Pf ${VAGRANT_IMAGE}
 
 configureBoot
 configureRoot

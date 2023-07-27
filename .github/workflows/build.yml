@@ -20,19 +20,20 @@ jobs:
         run: ./scripts/build.sh
         env:
           LC_ALL: en_US.UTF-8
+          LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
+          LC_PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
+          LC_SSH_AUTH_KEY: ${{secrets.SSH_AUTH_KEY}}
+          LC_EXTERNAL_IP: ${{vars.LC_EXTERNAL_IP}}
+          LC_EXTERNAL_NET: ${{vars.LC_EXTERNAL_NET}}
+          LC_EXTERNAL_GW: ${{vars.LC_EXTERNAL_GW}}
+          LC_EXTERNAL_DOMAIN: ${{vars.LC_EXTERNAL_DOMAIN}}
+          LC_EXTERNAL_DNS: ${{vars.LC_EXTERNAL_DNS}}
+          LC_EXTERNAL_DEVICE: ${{vars.LC_EXTERNAL_DEVICE}}
+          LC_HOSTNAME: ${{vars.LC_HOSTNAME}}
           LC_IMAGE_HREF: ${{vars.LC_IMAGE_HREF}}
           LC_IMAGE_SHA: ${{vars.LC_IMAGE_SHA}}
-          LC_SSH_AUTH_KEY: ${{secrets.SSH_AUTH_KEY}}
-          LC_PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
-          LC_EXTERNAL_IP: ${{secrets.LC_EXTERNAL_IP}}
-          LC_EXTERNAL_NM: ${{secrets.LC_EXTERNAL_NM}}
-          LC_EXTERNAL_GW: ${{secrets.LC_EXTERNAL_GW}}
-          LC_EXTERNAL_DOMAIN: ${{secrets.LC_EXTERNAL_DOMAIN}}
-          LC_EXTERNAL_DNS: ${{secrets.LC_EXTERNAL_DNS}}
-          LC_EXTERNAL_DEVICE: ${{secrets.LC_EXTERNAL_DEVICE}}
-          LC_LOCAL_DNS: ${{secrets.LC_LOCAL_DNS}}
-          LC_INTERNAL_DEVICE: ${{secrets.LC_INTERNAL_DEVICE}}
-          LC_INTERNAL_IP: ${{secrets.LC_INTERNAL_IP}}
-          LC_INTERNAL_NM: ${{secrets.LC_INTERNAL_NM}}
-          LC_INTERNAL_DOMAIN: ${{secrets.LC_INTERNAL_DOMAIN}}
-          LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
+          LC_INTERNAL_DEVICE: ${{vars.LC_INTERNAL_DEVICE}}
+          LC_INTERNAL_IP: ${{vars.LC_INTERNAL_IP}}
+          LC_INTERNAL_NET: ${{vars.LC_INTERNAL_NET}}
+          LC_INTERNAL_DOMAIN: ${{vars.LC_INTERNAL_DOMAIN}}
+          LC_LOCAL_DNS: ${{vars.LC_LOCAL_DNS}}
