@@ -18,14 +18,21 @@ Features:
 - Vagrant
 - Github Actions (optional)
 
-### Environment variables
+### Setting up
 
+You will need to set the secret environment variables in a file called `.env` in the project root.
+Everything else is configuration you wish to commit. This goes in a file called `config` in the project root.
 You can build a bootable instance without the variables marked optional, although they are recommended.
 
-`LC_HOSTNAME` hostname of the server  
+#### Secret environment variables
+
 `LC_DEFAULT_USER` name of your default user for the cluster  
 `LC_SSH_AUTH_KEY` your SSH auth key to access the cluster (optional)  
-`LC_PACKER_GITHUB_API_TOKEN` your Packer API token (optional)  
+`LC_PACKER_GITHUB_API_TOKEN` your Packer API token (optional)
+
+#### Everything else
+
+`LC_HOSTNAME` hostname of the server  
 `LC_EXTERNAL_DEVICE` your external facing device (e.g. eth0)  
 `LC_EXTERNAL_IP` the public ip v4 address of your cluster  
 `LC_EXTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.1.0/24  
@@ -40,16 +47,14 @@ You can build a bootable instance without the variables marked optional, althoug
 `LC_IMAGE_HREF` the HREF to node linux your base image  
 `LC_IMAGE_SHA` the SHA for your base node linux image
 
-Recommended values:
+#### Recommended values
 
 `LC_IMAGE_HREF`: `http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip`
 `LC_IMAGE_SHA`: `sha256:d694d2838018cf0d152fe81031dba83182cee79f785c033844b520d222ac12f5`
 
-### Building locally
+### Build
 
-You will need to set the environment variables in a file called `.env` in the project root.
-
-Build the project by running
+Build the project locally by running
 
 `./scripts/build.sh`
 
@@ -58,29 +63,6 @@ The output disk image will be found in `./images/scooby.img`
 ### Building with Github Actions
 
 Once you have cloned this project, populate the ci build action's variables and secrets in Github project settings.
-
-#### Secrets
-
-`LC_DEFAULT_USER`  
-`LC_PACKER_GITHUB_API_TOKEN`  
-`LC_SSH_AUTH_KEY`
-
-#### Variables
-
-`LC_EXTERNAL_IP`  
-`LC_EXTERNAL_NET`  
-`LC_EXTERNAL_GW`  
-`LC_EXTERNAL_DOMAIN`  
-`LC_EXTERNAL_DNS`  
-`LC_EXTERNAL_DEVICE`  
-`LC_HOSTNAME`  
-`LC_IMAGE_HREF`  
-`LC_IMAGE_SHA`  
-`LC_INTERNAL_DEVICE`  
-`LC_INTERNAL_IP`  
-`LC_INTERNAL_NET`  
-`LC_INTERNAL_DOMAIN`  
-`LC_LOCAL_DNS`
 
 ### Runners
 

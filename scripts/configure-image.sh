@@ -19,10 +19,6 @@ SSH_DIR=${SCOOBY_DIR}/ssh
 CONFIG_DIR=/etc/scooby/agents
 MOUNT_DIR=/mnt/scooby/agents
 
-INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
-INTERNAL_MASK=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $2}')
-EXTERNAL_MASK=$(printf "${LC_EXTERNAL_NET}" | awk -F/ '{print $2}')
-
 resizeImage
 
 losetup -Pf ${VAGRANT_IMAGE}

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./config
+
 VARS="./.env"
 
 #load local variables if available
@@ -15,7 +17,7 @@ vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_IMAGE_HREF,LC_IMAGE_SHA,LC
 dd if=./images/scooby.img of=./images/scooby-agent.img bs=1M status=progress
 
 printf "CREATE SERVER IMAGE\n"
-vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_DEVICE,LC_EXTERNAL_IP,LC_INTERNAL_IP,LC_INTERNAL_DEVICE,LC_DEFAULT_USER ./scripts/configure-image.sh"
+vagrant ssh -c "cd /vagrant && sudo --preserve-env=LC_EXTERNAL_IP,LC_EXTERNAL_NET,LC_EXTERNAL_GW,LC_EXTERNAL_DOMAIN,LC_EXTERNAL_DNS,LC_EXTERNAL_DEVICE,LC_HOSTNAME,LC_INTERNAL_DEVICE,LC_INTERNAL_IP,LC_INTERNAL_NET,LC_INTERNAL_DOMAIN,LC_LOCAL_DNS ./scripts/configure-image.sh"
 
 printf "DESTROY VIRTUAL BUILD HOST\n"
 vagrant destroy --force --no-tty

@@ -29,6 +29,8 @@ importAgentImage() {
 }
 
 configureRoot() {
+INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
+
 mkdir -p ${ROOT_MNT}
 mount ${LOOP_DEV}p2 ${ROOT_MNT}
 

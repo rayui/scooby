@@ -2,6 +2,9 @@
 
 configureBoot() {
 
+INTERNAL_MASK=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $2}')
+EXTERNAL_MASK=$(printf "${LC_EXTERNAL_NET}" | awk -F/ '{print $2}')
+
 mkdir -p ${BOOT_MNT}
 mount ${LOOP_DEV}p1 ${BOOT_MNT}
 
