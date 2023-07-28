@@ -1,6 +1,8 @@
 #!/bin/sh
 
-VAGRANT_IMAGE=/vagrant/images/scooby.img
+. ./config
+
+VAGRANT_IMAGE=./images/scooby.img
 
 set -e
 
