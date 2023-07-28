@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. ./config
 . ./scripts/resize-image.sh
 . ./scripts/configure-boot.sh
 . ./scripts/configure-root.sh
