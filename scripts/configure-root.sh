@@ -56,7 +56,7 @@ interface=${LC_INTERNAL_DEVICE}
 dhcp-range=tag:${LC_INTERNAL_DEVICE},${INTERNAL_NET},static
 dhcp-option=tag:${LC_INTERNAL_DEVICE},66,${LC_INTERNAL_IP}
 dhcp-option=tag:${LC_INTERNAL_DEVICE},option:router,${LC_INTERNAL_IP}
-dhcp-option=tag:${LC_INTERNAL_DEVICE},6,${LC_EXTERNAL_DNS}
+dhcp-option=tag:${LC_INTERNAL_DEVICE},6,${LC_PRIMARY_DNS}
 
 enable-tftp=${LC_INTERNAL_DEVICE}
 tftp-root=/tftpboot/

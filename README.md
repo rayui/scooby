@@ -36,10 +36,10 @@ You can build a bootable instance without the variables marked optional, althoug
 `LC_EXTERNAL_DEVICE` your external facing device (e.g. eth0)  
 `LC_EXTERNAL_IP` the public ip v4 address of your cluster  
 `LC_EXTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.1.0/24  
-`LC_EXTERNAL_DNS` external DNS provider, e.g. 1.0.0.1  
+`LC_PRIMARY_DNS` external DNS provider, e.g. 1.0.0.1  
 `LC_EXTERNAL_DOMAIN` domain on external nic the domain of your lan  
 `LC_EXTERNAL_GW` public gateway of your lan  
-`LC_LOCAL_DNS` local dns provider, e.g 192.168.1.66 (optional)  
+`LC_SECONDARY_DNS` local dns provider, e.g 192.168.1.66 (optional)  
 `LC_INTERNAL_IP` the private ip v4 address of your cluster  
 `LC_INTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.64. 0/24
 `LC_INTERNAL_DEVICE` the internal device name for your cluster (e.g. eth1)  
