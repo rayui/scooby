@@ -73,15 +73,29 @@ If you wish to use Github's own runners, you will need to edit `./github/workflo
 
 Any files placed in the `/server` directory will be copied into the image as static assets. They are persistent and available on first boot.
 
-Kubernetes manifests should go in `/server/var/lib/k3s/server/manifests`
+Kubernetes manifests should go in `/server/var/lib/rancher/k3s/server/manifests`
 
 ## Agent config
 
-The server configuration step will create one agent instance for each directory in `/server/etc/scooby/agents/{hostname}`. Each agent directory must have the following files with contents as described:
+On build, the server configuration step will create one agent instance for each directory in `/server/etc/scooby/agents/{hostname}`. Agents are described in the `agents` folder in the project root. Create one file for each agent node. The name of the file is the hostname of the agent node. The required variables are:
 
-- `ethernet` - the mac address of the agent
-- `ip` - the ipv4 address of the agent
-- `rancher_partition_uuid` - partition uuid of local storage for k3s agent. This could be e.g. sd card or usb storage
-- `tftp_client_id` - the tftp id of the client. You can find the client id of any RPi with: `cat /sys/firmware/devicetree/base/serial-number`
+`AGENT_ETHERNET`, `AGENT_IP`, `AGENT_RANCHER_PART_UUID`, `AGENT_PXE_ID`
 
-If there are no complete agent definitions, the server will be the only node in the cluster.
+An optional variable, `AGENT_K3S_ARGS`, allows you to provide extra arguments to the K3S agent.
+
+An example agent description file might look like the following:
+
+```AGENT_ETHERNET=b8:27:eb:81:1a:52
+AGENT_IP=192.168.64.65
+AGENT_RANCHER_PART_UUID=d5f9e6c2-493c-48da-baf2-0c63dd7a36b1
+AGENT_PXE_ID=c6811a52
+AGENT_K3S_ARGS="--node-label 'smarter-device-manager=enabled'"
+```
+
+You can find the PXE client id of any Raspberry Pi with the following command on the client console:
+
+```
+$ cat /sys/firmware/devicetree/base/serial-number
+```
+
+An incomplete or incorrect agent description will not result in a bootable agent node.
