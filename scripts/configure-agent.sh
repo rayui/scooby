@@ -1,9 +1,8 @@
 #!/bin/sh
 
-ROOT_MNT=/tmp/root
-CONFIG_DIR=/etc/scooby/agents
-
 configureAgent() {
+
+AGENT=${1}
 
 SCOOBY_DIR=/var/lib/scooby
 BASE_DIR=${SCOOBY_DIR}/base
@@ -11,7 +10,8 @@ SSH_DIR=${SCOOBY_DIR}/ssh
 MOUNT_DIR=/mnt/scooby/agents
 RANCHERSTORAGEPATH=/var/lib/rancher
 
-AGENT=${1}
+. ${AGENT_DIR}/${AGENT}
+
 AGENT_ROOT=${ROOT_MNT}${CONFIG_DIR}/${AGENT}
 
 printf "CONFIGURING AGENT ${AGENT}\n"
@@ -37,7 +37,7 @@ ${MOUNT_DIR}/${AGENT} ${AGENT}(rw,sync,no_subtree_check,no_root_squash,fsid=${FS
 EOF
 
 ### SETUP AGENT TFTPBOOT
-ln -s ${MOUNT_DIR}/${AGENT}/boot ${ROOT_MNT}/tftpboot/$(cat ${AGENT_ROOT}/tftp_client_id)
+ln -s ${MOUNT_DIR}/${AGENT}/boot ${ROOT_MNT}/tftpboot/${AGENT_PXE_ID}
 
 ### CREATE AGENT NETWORK BOOT FILES
 mkdir -p ${AGENT_ROOT}/boot/
@@ -86,7 +86,6 @@ mkdir -p ${AGENT_ROOT}${RANCHERSTORAGEPATH}
 
 ### CREATE AGENT FSTAB
 mkdir -p ${AGENT_ROOT}/etc/
-AGENT_RANCHER_PART_UUID=$(cat ${AGENT_ROOT}/rancher_partition_uuid)
 
 cat - > ${AGENT_ROOT}/etc/fstab << EOF
 proc /proc proc defaults 0 0
@@ -95,8 +94,6 @@ UUID="${AGENT_RANCHER_PART_UUID}" ${RANCHERSTORAGEPATH} ext4 defaults 0 0
 EOF
 
 ### CREATE AGENT DNSMASQ ENTRY
-AGENT_ETHERNET=$(cat ${AGENT_ROOT}/ethernet)
-AGENT_IP=$(cat ${AGENT_ROOT}/ip)
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/20-scooby-agent-${AGENT} << EOF
 dhcp-host=net:${AGENT},${AGENT_ETHERNET},${AGENT},${AGENT_IP},24h
 dhcp-option=net:${AGENT},17,${LC_INTERNAL_IP}:${MOUNT_DIR}/${AGENT}
@@ -130,7 +127,7 @@ configureAgents() {
   mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
   FSID=1
-  for AGENT in $(cd ${ROOT_MNT}${CONFIG_DIR}; ls -d *)
+  for AGENT in $(cd ${AGENT_DIR}; ls -d *)
   do
     configureAgent "${AGENT}"
     FSID=$((FSID+1))

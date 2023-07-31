@@ -8,6 +8,7 @@
 
 VAGRANT=/vagrant
 VAGRANT_IMAGE=${VAGRANT}/images/scooby.img
+AGENT_DIR=${VAGRANT}/agents
 
 LOOP_DEV=/dev/loop0
 LOOP_DEV2=/dev/loop1
