@@ -114,7 +114,7 @@ k3sup join \
 --user ${LC_DEFAULT_USER} \
 --server-user ${LC_DEFAULT_USER} \
 --ssh-key "${SSH_DIR}/id_ed25519" \
---k3s-extra-args "--node-name '${AGENT}' --node-label 'smarter-device-manager=enabled'"
+--k3s-extra-args "--node-name '${AGENT}' ${AGENT_K3S_ARGS}"
 
 wall "${AGENT} IS ONLINE"
 EOF
