@@ -140,6 +140,9 @@ cat - >> ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh << EOF
 BOOT_MNT_LOCAL=/mnt/boot
 ROOT_MNT_LOCAL=/mnt/root
 
+#PREVENT PI DEFAULT ACCOUNT LOGIN
+usermod pi -s /sbin/nologin
+
 #SSH KEYS
 ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
 cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub >> /home/${LC_DEFAULT_USER}/.ssh/authorized_keys
