@@ -27,7 +27,7 @@ jobs:
           LC_EXTERNAL_NET: ${{vars.LC_EXTERNAL_NET}}
           LC_EXTERNAL_GW: ${{vars.LC_EXTERNAL_GW}}
           LC_EXTERNAL_DOMAIN: ${{vars.LC_EXTERNAL_DOMAIN}}
-          LC_EXTERNAL_DNS: ${{vars.LC_EXTERNAL_DNS}}
+          LC_PRIMARY_DNS: ${{vars.LC_PRIMARY_DNS}}
           LC_EXTERNAL_DEVICE: ${{vars.LC_EXTERNAL_DEVICE}}
           LC_HOSTNAME: ${{vars.LC_HOSTNAME}}
           LC_IMAGE_HREF: ${{vars.LC_IMAGE_HREF}}
@@ -36,4 +36,4 @@ jobs:
           LC_INTERNAL_IP: ${{vars.LC_INTERNAL_IP}}
           LC_INTERNAL_NET: ${{vars.LC_INTERNAL_NET}}
           LC_INTERNAL_DOMAIN: ${{vars.LC_INTERNAL_DOMAIN}}
-          LC_LOCAL_DNS: ${{vars.LC_LOCAL_DNS}}
+          LC_SECONDARY_DNS: ${{vars.LC_SECONDARY_DNS}}

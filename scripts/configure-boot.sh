@@ -19,7 +19,7 @@ ethernets:
     gateway4: ${LC_EXTERNAL_GW}
     nameservers:
       search: [${LC_EXTERNAL_DOMAIN}]
-      addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
+      addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
   ${LC_INTERNAL_DEVICE}:
     dhcp4: false
     gateway4: ${LC_EXTERNAL_IP}
@@ -27,7 +27,7 @@ ethernets:
     - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
     nameservers:
       search: [${LC_INTERNAL_DOMAIN}]
-      addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
+      addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
 EOF
 chmod a+x ${BOOT_MNT}/network-config
 
@@ -42,7 +42,7 @@ network:
       gateway4: ${LC_EXTERNAL_GW}
       nameservers:
         search: [${LC_EXTERNAL_DOMAIN}]
-        addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
+        addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
     ${LC_INTERNAL_DEVICE}:
       dhcp4: false
       gateway4: ${LC_EXTERNAL_IP}
@@ -50,7 +50,7 @@ network:
       - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
       nameservers:
         search: [${LC_INTERNAL_DOMAIN}]
-        addresses: [${LC_EXTERNAL_DNS}, ${LC_LOCAL_DNS}]
+        addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
 EOF
 chmod a+x ${BOOT_MNT}/meta-data
 
