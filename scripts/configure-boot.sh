@@ -2,11 +2,19 @@
 
 configureBoot() {
 
+losetup -Pf ${VAGRANT_IMAGE}
+
 INTERNAL_MASK=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $2}')
 EXTERNAL_MASK=$(printf "${LC_EXTERNAL_NET}" | awk -F/ '{print $2}')
 
 mkdir -p ${BOOT_MNT}
 mount ${LOOP_DEV}p1 ${BOOT_MNT}
+
+### CREATE SERVER CMDLINE.TXT
+cat - > ${BOOT_MNT}/cmdline.txt << EOF
+console=serial0,115200 console=tty1 root=PARTUUID=${DISK_ID}-04 rootfstype=ext4 fsck.repair=yes rootwait quiet init=/usr/lib/raspi-config/init_resize.sh cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+EOF
+chmod a+x ${BOOT_MNT}/cmdline.txt
 
 ### SET UP SERVER BOOT CONFIG
 cat - > ${BOOT_MNT}/network-config << EOF
@@ -85,5 +93,7 @@ chmod a+x ${BOOT_MNT}/user-data
 
 ### FINISHED WITH BOOT MOUNT
 umount ${BOOT_MNT}
+
+losetup -D
 
 }

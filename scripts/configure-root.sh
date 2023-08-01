@@ -1,42 +1,29 @@
 #!/bin/sh
 
-importAgentImage() {
-  TMP_BOOT=/tmp/agent-boot
-  TMP_ROOT=/tmp/agent-root
-
-  #MOUNT IMAGE AS LOOP DEVICE
-  losetup -Pf ${VAGRANT}/images/scooby-agent.img
-  mkdir -p ${BOOT_MNT}
-  mkdir -p ${ROOT_MNT}
-  mkdir -p ${TMP_BOOT}
-  mkdir -p ${TMP_ROOT}
-  mount ${LOOP_DEV}p2 ${ROOT_MNT}
-  mount ${LOOP_DEV2}p1 ${TMP_BOOT}
-  mount ${LOOP_DEV2}p2 ${TMP_ROOT}
-
-  #COPY IMAGE INTO BASE
-  mkdir -p ${ROOT_MNT}${BASE_DIR}/boot
-  rsync -xa --progress -r ${TMP_ROOT}/* ${ROOT_MNT}${BASE_DIR}
-  rsync -xa --progress -r ${TMP_BOOT}/* ${ROOT_MNT}${BASE_DIR}/boot
-
-  #PUT BOOTCODE.BIN IN TFTPBOOT
-  rsync -xa --progress ${TMP_BOOT}/bootcode.bin ${ROOT_MNT}/tftpboot/
-
-  #UNMOUNT LOOP DEVICES
-  umount ${TMP_BOOT}
-  umount ${TMP_ROOT}
-  umount ${ROOT_MNT}
-}
-
 configureRoot() {
 INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
 
+losetup -Pf ${VAGRANT_IMAGE}
 mkdir -p ${ROOT_MNT}
-mount ${LOOP_DEV}p2 ${ROOT_MNT}
+mount ${LOOP_DEV}p4 ${ROOT_MNT}
 
 ### COPY STATIC CONFIG
 rsync -x --progress -r ${VAGRANT}/server/* ${ROOT_MNT}
 printf "COPIED STATIC CONFIG\n"
+
+### CREATE AGENT MOUNT DIRECTORIES
+
+mkdir -p ${ROOT_MNT}/${AGENT_BOOT_DIR}/boot
+mkdir -p ${ROOT_MNT}/${AGENT_ROOT_DIR}
+
+### ADD AGENT PARTITIONS TO FSTAB
+cat - > ${ROOT_MNT}/etc/fstab << EOF
+proc            /proc           proc    defaults          0       0
+PARTUUID=${DISK_ID}-01  /boot           vfat    defaults          0       2
+PARTUUID=${DISK_ID}-02  ${AGENT_ROOT_DIR}               ext4    defaults,noatime  0       2
+PARTUUID=${DISK_ID}-03  ${AGENT_BOOT_DIR}/boot               vfat    defaults  0       2
+PARTUUID=${DISK_ID}-04  /               ext4    defaults,noatime  0       1
+EOF
 
 ### BASE SERVICES CONFIG
 ## INTERNAL DNSMASQ
@@ -50,7 +37,7 @@ log-dhcp
 EOF
 
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/10-scooby-dhcp.conf << EOF
-domain=${LC_INTERNAL_DOMAIN}
+domain=${LC_INTERNAL_DOMAIN},${LC_INTERNAL_NET}
 interface=${LC_INTERNAL_DEVICE}
 
 dhcp-range=tag:${LC_INTERNAL_DEVICE},${INTERNAL_NET},static
@@ -137,11 +124,10 @@ EOF
 cat - >> ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh << EOF
 #!/bin/sh
 
-BOOT_MNT_LOCAL=/mnt/boot
-ROOT_MNT_LOCAL=/mnt/root
-
 #PREVENT PI DEFAULT ACCOUNT LOGIN
 usermod pi -s /sbin/nologin
+
+rsync -xa --progress ${AGENT_BOOT_DIR}/bootcode.bin /tftpboot/
 
 #SSH KEYS
 ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
@@ -177,7 +163,7 @@ mkdir -p ${ROOT_MNT}${CONFIG_DIR}
 mkdir -p ${ROOT_MNT}/tftpboot
 
 umount ${ROOT_MNT}
-
+losetup -D
 }
 
 

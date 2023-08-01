@@ -1,6 +1,6 @@
 $script = <<-SCRIPT
   apt update -y
-  apt install -y curl
+  apt install -y curl dosfstools
   curl -sL get.hashi-up.dev | sh
   hashi-up packer get -d /usr/local/bin
 SCRIPT
