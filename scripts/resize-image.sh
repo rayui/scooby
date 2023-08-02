@@ -4,7 +4,7 @@ resizeImage() {
   ### RESIZE IMAGE
   
   ROOTSTARTSECTOR=$(sfdisk -l -o Start ${VAGRANT_IMAGE} | tail -n 1)
-  dd if=/dev/zero bs=1M count=2000 status=progress >> ${VAGRANT_IMAGE}
+  dd if=/dev/zero bs=1M count=2000 status=noxfer >> ${VAGRANT_IMAGE}
   sfdisk --delete ${VAGRANT_IMAGE} 2
   printf "${ROOTSTARTSECTOR},+,L" | sfdisk -a ${VAGRANT_IMAGE}
 

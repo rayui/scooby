@@ -13,10 +13,10 @@ mkdir -p ${ROOT_MNT}${CONFIG_DIR}
 mkdir -p ${ROOT_MNT}/tftpboot
 
 #PUT BOOTCODE.BIN IN TFTPBOOT
-rsync -xa --info=progress2 ${ROOT_MNT}${BASE_DIR}/boot/bootcode.bin ${ROOT_MNT}/tftpboot/
+rsync -xa --stats ${ROOT_MNT}${BASE_DIR}/boot/bootcode.bin ${ROOT_MNT}/tftpboot/
 
 ### COPY STATIC CONFIG
-rsync -xa --info=progress2 -r ${VAGRANT}/server/* ${ROOT_MNT}
+rsync -xa --stats -r ${VAGRANT}/server/* ${ROOT_MNT}
 printf "COPIED STATIC CONFIG\n"
 
 ### BASE SERVICES CONFIG
@@ -133,8 +133,8 @@ for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
 do
   ### COPY AGENT KEYS FOR K3S
   mkdir -p ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/
-  rsync -xa --info=progress2 /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
-  rsync -xa --info=progress2 /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
   cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/authorized_keys
 done
 
@@ -144,7 +144,7 @@ cd /tmp && curl -sLS https://get.k3sup.dev | sh
 k3sup install --ip ${LC_INTERNAL_IP} --user ${LC_DEFAULT_USER} --ssh-key "/home/${LC_DEFAULT_USER}/.ssh/id_ed25519" --k3s-extra-args "--node-external-ip=${LC_EXTERNAL_IP} --flannel-iface='${LC_INTERNAL_DEVICE}' --kube-apiserver-arg 'service-node-port-range=1000-32767'"
 
 mkdir -p /root/.kube
-rsync -xa --info=progress2 ./kubeconfig /root/.kube/config
+rsync -xa --stats ./kubeconfig /root/.kube/config
 
 #READY
 wall "BUFFY WILL PATROL TONIGHT"
