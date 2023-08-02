@@ -11,7 +11,6 @@ VAGRANT_IMAGE=${VAGRANT}/images/scooby.img
 AGENT_DIR=${VAGRANT}/agents
 
 LOOP_DEV=/dev/loop0
-LOOP_DEV2=/dev/loop1
 BOOT_MNT=/tmp/boot
 ROOT_MNT=/tmp/root
 
@@ -25,9 +24,9 @@ resizeImage
 
 losetup -Pf ${VAGRANT_IMAGE}
 
+createAgentBase
 configureBoot
 configureRoot
-importAgentImage
 configureAgents
 
 losetup -D
