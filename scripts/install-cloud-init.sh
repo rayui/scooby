@@ -27,7 +27,7 @@ cat - > /etc/cloud/cloud.cfg.d/99_fake_cloud.cfg << EOF
 datasource_list: [ NoCloud, None ]
 datasource:
   NoCloud:
-    fs_label: SCOOBY
+    fs_label: boot
 EOF
 
 cat - > /etc/cloud/cloud.cfg.d/99_raspbian.cfg << EOF
@@ -48,6 +48,12 @@ ssh_authorized_keys:
   - ${SSH_AUTH_KEY}
 EOF
 
+#add required arguments to kernel
+sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
+
+#disable wifi and bluetooth
+sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
+
 #CREATE COMMON BOOT FILES
 cat - > /boot/ssh << EOF
 EOF
@@ -65,12 +71,6 @@ network:
       dhcp4: true
 EOF
 chmod a+x /boot/meta-data
-
-cat - >> /boot/config.txt << EOF
-dtoverlay=disable-wifi
-dtoverlay=disable-bt 
-EOF
-chmod a+x /boot/config.txt
 
 # Disable dhcpcd - it has a conflict with cloud-init network config
 systemctl mask dhcpcd

@@ -18,3 +18,6 @@ packer build \
   -var "default_user=${LC_DEFAULT_USER}" \
   -var "external_device=${LC_EXTERNAL_DEVICE}" \
   -parallel-builds=1 packer/
+
+  #MAKE BOOTABLE
+  sfdisk -A -N 1 ${VAGRANT_IMAGE}

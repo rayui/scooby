@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ./config
-. ./scripts/clone-image.sh
+. ./scripts/resize-image.sh
 . ./scripts/configure-boot.sh
 . ./scripts/configure-root.sh
 . ./scripts/configure-agent.sh
@@ -16,19 +16,18 @@ BOOT_MNT=/tmp/boot
 ROOT_MNT=/tmp/root
 
 SCOOBY_DIR=/var/lib/scooby
+BASE_DIR=${SCOOBY_DIR}/base
 SSH_DIR=${SCOOBY_DIR}/ssh
 CONFIG_DIR=/etc/scooby/agents
-AGENT_BOOT_DIR=/mnt/scooby/boot
-AGENT_ROOT_DIR=/mnt/scooby/root
-
 MOUNT_DIR=/mnt/scooby/agents
-RANCHERSTORAGEPATH=/var/lib/rancher
+
+resizeImage
 
 losetup -Pf ${VAGRANT_IMAGE}
-DISK_ID=$(blkid --match-tag PARTUUID ${LOOP_DEV}p1 | grep -oE "[a-f0-9]{8}")
-losetup -D
 
-cloneBaseImage
 configureBoot
 configureRoot
+importAgentImage
 configureAgents
+
+losetup -D

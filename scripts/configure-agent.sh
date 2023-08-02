@@ -4,6 +4,12 @@ configureAgent() {
 
 AGENT=${1}
 
+SCOOBY_DIR=/var/lib/scooby
+BASE_DIR=${SCOOBY_DIR}/base
+SSH_DIR=${SCOOBY_DIR}/ssh
+MOUNT_DIR=/mnt/scooby/agents
+RANCHERSTORAGEPATH=/var/lib/rancher
+
 . ${AGENT_DIR}/${AGENT}
 
 AGENT_ROOT=${ROOT_MNT}${CONFIG_DIR}/${AGENT}
@@ -11,6 +17,7 @@ AGENT_ROOT=${ROOT_MNT}${CONFIG_DIR}/${AGENT}
 printf "CONFIGURING AGENT ${AGENT}\n"
 
 ### AGENT HOST ENTRY
+AGENT_IP=$(cat ${AGENT_ROOT}/ip)
 cat - >> ${ROOT_MNT}/etc/hosts << EOF
 ${AGENT_IP} ${AGENT}
 EOF
@@ -21,7 +28,7 @@ mkdir -p ${ROOT_MNT}${MOUNT_DIR}/${AGENT}
 mkdir -p ${ROOT_MNT}${SCOOBY_DIR}/overlay/${AGENT}
 
 cat - >> ${ROOT_MNT}/etc/fstab << EOF
-${AGENT} ${MOUNT_DIR}/${AGENT} overlay nfs_export=on,index=on,defaults,lowerdir=${CONFIG_DIR}/${AGENT}:${AGENT_BOOT_DIR}:${AGENT_ROOT_DIR},upperdir=${SCOOBY_DIR}/agents/${AGENT},workdir=${SCOOBY_DIR}/overlay/${AGENT} 0 0
+${AGENT} ${MOUNT_DIR}/${AGENT} overlay nfs_export=on,index=on,defaults,lowerdir=${CONFIG_DIR}/${AGENT}:${BASE_DIR},upperdir=${SCOOBY_DIR}/agents/${AGENT},workdir=${SCOOBY_DIR}/overlay/${AGENT} 0 0
 EOF
 
 ### EXPORT THE AGENT WITH NFS
@@ -116,10 +123,8 @@ chmod a+x ${AGENT_ROOT}/usr/local/bin/finalize-cloud-init-agent.sh
 }
 
 configureAgents() {
-  losetup -Pf ${VAGRANT_IMAGE}
-
   mkdir -p ${ROOT_MNT}
-  mount ${LOOP_DEV}p4 ${ROOT_MNT}
+  mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
   FSID=1
   for AGENT in $(cd ${AGENT_DIR}; ls -d *)
@@ -129,6 +134,4 @@ configureAgents() {
   done
 
   umount ${ROOT_MNT}
-
-  losetup -D
 }
