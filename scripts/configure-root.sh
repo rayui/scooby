@@ -1,41 +1,22 @@
 #!/bin/sh
 
-importAgentImage() {
-  TMP_BOOT=/tmp/agent-boot
-  TMP_ROOT=/tmp/agent-root
-
-  #MOUNT IMAGE AS LOOP DEVICE
-  losetup -Pf ${VAGRANT}/images/scooby-agent.img
-  mkdir -p ${BOOT_MNT}
-  mkdir -p ${ROOT_MNT}
-  mkdir -p ${TMP_BOOT}
-  mkdir -p ${TMP_ROOT}
-  mount ${LOOP_DEV}p2 ${ROOT_MNT}
-  mount ${LOOP_DEV2}p1 ${TMP_BOOT}
-  mount ${LOOP_DEV2}p2 ${TMP_ROOT}
-
-  #COPY IMAGE INTO BASE
-  mkdir -p ${ROOT_MNT}${BASE_DIR}/boot
-  rsync -xa --progress -r ${TMP_ROOT}/* ${ROOT_MNT}${BASE_DIR}
-  rsync -xa --progress -r ${TMP_BOOT}/* ${ROOT_MNT}${BASE_DIR}/boot
-
-  #PUT BOOTCODE.BIN IN TFTPBOOT
-  rsync -xa --progress ${TMP_BOOT}/bootcode.bin ${ROOT_MNT}/tftpboot/
-
-  #UNMOUNT LOOP DEVICES
-  umount ${TMP_BOOT}
-  umount ${TMP_ROOT}
-  umount ${ROOT_MNT}
-}
-
 configureRoot() {
 INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
 
 mkdir -p ${ROOT_MNT}
 mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
+### AGENT CONFIG
+mkdir -p ${ROOT_MNT}${CONFIG_DIR}
+
+#CREATE TFTPBOOT DIRECTORY
+mkdir -p ${ROOT_MNT}/tftpboot
+
+#PUT BOOTCODE.BIN IN TFTPBOOT
+rsync -xa --info=progress2 ${ROOT_MNT}${BASE_DIR}/boot/bootcode.bin ${ROOT_MNT}/tftpboot/
+
 ### COPY STATIC CONFIG
-rsync -x --progress -r ${VAGRANT}/server/* ${ROOT_MNT}
+rsync -xa --info=progress2 -r ${VAGRANT}/server/* ${ROOT_MNT}
 printf "COPIED STATIC CONFIG\n"
 
 ### BASE SERVICES CONFIG
@@ -152,8 +133,8 @@ for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
 do
   ### COPY AGENT KEYS FOR K3S
   mkdir -p ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
-  rsync -xa --progress /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  rsync -xa --info=progress2 /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+  rsync -xa --info=progress2 /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
   cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/authorized_keys
 done
 
@@ -163,18 +144,14 @@ cd /tmp && curl -sLS https://get.k3sup.dev | sh
 k3sup install --ip ${LC_INTERNAL_IP} --user ${LC_DEFAULT_USER} --ssh-key "/home/${LC_DEFAULT_USER}/.ssh/id_ed25519" --k3s-extra-args "--node-external-ip=${LC_EXTERNAL_IP} --flannel-iface='${LC_INTERNAL_DEVICE}' --kube-apiserver-arg 'service-node-port-range=1000-32767'"
 
 mkdir -p /root/.kube
-rsync -xa --progress ./kubeconfig /root/.kube/config
+rsync -xa --info=progress2 ./kubeconfig /root/.kube/config
 
 #READY
 wall "BUFFY WILL PATROL TONIGHT"
 EOF
 chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
 
-### AGENT CONFIG
-mkdir -p ${ROOT_MNT}${CONFIG_DIR}
 
-#CREATE TFTPBOOT DIRECTORY
-mkdir -p ${ROOT_MNT}/tftpboot
 
 umount ${ROOT_MNT}
 

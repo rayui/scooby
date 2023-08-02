@@ -1,5 +1,23 @@
 #!/bin/sh
 
+createAgentBase() {
+  #MOUNT IMAGE AS LOOP DEVICE
+  mkdir -p ${BOOT_MNT}
+  mkdir -p ${ROOT_MNT}
+  mount ${LOOP_DEV}p1 ${BOOT_MNT}
+  mount ${LOOP_DEV}p2 ${ROOT_MNT}
+
+  #COPY IMAGE INTO BASE
+  mkdir -p ${ROOT_MNT}${BASE_DIR}/boot
+  BASE_DIR_RELATIVE=$(printf "${BASE_DIR}" | grep -oE "[^\/].*$")
+  rsync -xa --info=progress2 --exclude="${BASE_DIR_RELATIVE}" ${ROOT_MNT}/* ${ROOT_MNT}${BASE_DIR}/
+  rsync -xa --info=progress2 ${BOOT_MNT}/* ${ROOT_MNT}${BASE_DIR}/boot
+
+  #UNMOUNT LOOP DEVICES
+  umount ${BOOT_MNT}
+  umount ${ROOT_MNT}
+}
+
 configureAgent() {
 
 AGENT=${1}
@@ -17,7 +35,6 @@ AGENT_ROOT=${ROOT_MNT}${CONFIG_DIR}/${AGENT}
 printf "CONFIGURING AGENT ${AGENT}\n"
 
 ### AGENT HOST ENTRY
-AGENT_IP=$(cat ${AGENT_ROOT}/ip)
 cat - >> ${ROOT_MNT}/etc/hosts << EOF
 ${AGENT_IP} ${AGENT}
 EOF
