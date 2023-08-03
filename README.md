@@ -63,6 +63,15 @@ The output disk image will be found in `./images/scooby.img`
 ### Building with Github Actions
 
 Once you have cloned this project, populate the ci build action's variables and secrets in Github project settings.
+Build the project by merging a commit to `main`.
+If you have the AWS secrets set, GHA will attempt to upload your image to an S3 bucket of your choice.
+
+### GHA only secrets
+
+`AWS_KEY_ID` the Key ID for your AWS account  
+`AWS_SECRET_ACCESS_KEY` the Secret Access Key for your AWS account  
+`AWS_BUCKET_S3_URI` the S3 URI for your bucket account  
+`AWS_REGION` the AWS region in which your bucket is located
 
 ### Runners
 
