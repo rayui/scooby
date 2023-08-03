@@ -9,7 +9,8 @@ All you need to get going is at least one Raspberry Pi 3A or higher, a network a
 Features:
 
 - Statically configured
-- Network booted agents
+- Repeatable, hands-off deployments
+- Network booted agents - no local storage for OS required
 - Automated build pipelines for GHA and local development
 - Build, deploy and boot a bare-metal cluster from source in 15 minutes
 
@@ -21,7 +22,9 @@ Features:
 ### Setting up
 
 You will need to set the secret environment variables in a file called `.env` in the project root.
+
 Everything else is configuration you wish to commit. This goes in a file called `config` in the project root.
+
 You can build a bootable instance without the variables marked optional, although they are recommended.
 
 #### Secret environment variables
@@ -33,24 +36,42 @@ You can build a bootable instance without the variables marked optional, althoug
 #### Everything else
 
 `LC_HOSTNAME` hostname of the server  
+`LC_PRIMARY_DNS` external DNS provider, e.g. 1.0.0.1  
+`LC_SECONDARY_DNS` local dns provider, e.g 192.168.1.66 (optional)  
 `LC_EXTERNAL_DEVICE` your external facing device (e.g. eth0)  
 `LC_EXTERNAL_IP` the public ip v4 address of your cluster  
 `LC_EXTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.1.0/24  
-`LC_PRIMARY_DNS` external DNS provider, e.g. 1.0.0.1  
+`LC_EXTERNAL_GW` public gateway of your lan, e.g. 192.168.1.1  
 `LC_EXTERNAL_DOMAIN` domain on external nic the domain of your lan  
-`LC_EXTERNAL_GW` public gateway of your lan  
-`LC_SECONDARY_DNS` local dns provider, e.g 192.168.1.66 (optional)  
-`LC_INTERNAL_IP` the private ip v4 address of your cluster  
-`LC_INTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.64. 0/24
 `LC_INTERNAL_DEVICE` the internal device name for your cluster (e.g. eth1)  
-`LC_INTERNAL_DOMAIN` the internal domain name of your cluster, (e.g. sunnydale)
+`LC_INTERNAL_IP` the private ip v4 address of your cluster  
+`LC_INTERNAL_NET` network and netmask of your cluster nic, e.g. 192.168.64. 0/24  
+`LC_INTERNAL_DOMAIN` the internal domain name of your cluster, (e.g. sunnydale)  
 `LC_IMAGE_HREF` the HREF to node linux your base image  
 `LC_IMAGE_SHA` the SHA for your base node linux image
 
-#### Recommended values
+#### Default values
 
-`LC_IMAGE_HREF`: `http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip`
-`LC_IMAGE_SHA`: `sha256:d694d2838018cf0d152fe81031dba83182cee79f785c033844b520d222ac12f5`
+It is possible to build the cluster using only default values, however it is recommended to provide them all in your own `config` file as they are currently subject to change.
+
+```
+LC_HOSTNAME=buffy
+LC_DEFAULT_USER=spike
+LC_PRIMARY_DNS=1.0.0.1
+LC_SECONDARY_DNS=
+LC_EXTERNAL_DEVICE=eth0
+LC_EXTERNAL_IP=192.168.1.64
+LC_EXTERNAL_NET=192.168.1.0/24
+LC_EXTERNAL_DOMAIN=
+LC_EXTERNAL_GW=192.168.1.1
+LC_INTERNAL_IP=192.168.64.1
+LC_INTERNAL_NET=192.168.64.0/24
+LC_INTERNAL_DEVICE=eth1
+LC_INTERNAL_DOMAIN=sunnydale
+LC_IMAGE_HREF="http://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip"
+LC_IMAGE_SHA=sha256:d694d2838018cf0d152fe81031dba83182cee79f785c033844b520d222ac12f5
+
+```
 
 ### Build
 

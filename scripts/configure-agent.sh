@@ -143,12 +143,17 @@ configureAgents() {
   mkdir -p ${ROOT_MNT}
   mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
-  FSID=1
-  for AGENT in $(cd ${AGENT_DIR}; ls -d *)
-  do
-    configureAgent "${AGENT}"
-    FSID=$((FSID+1))
-  done
+  ### AGENT CONFIG
+  mkdir -p ${ROOT_MNT}${CONFIG_DIR}
+  
+  if [ -f ${AGENT_DIR} ] && [ $(find ${AGENT_DIR} -type f) ]; then
+    FSID=1
+    for AGENT in ${AGENT_DIR}/*
+    do
+      configureAgent "${AGENT}"
+      FSID=$((FSID+1))
+    done
+  fi
 
   umount ${ROOT_MNT}
 }
