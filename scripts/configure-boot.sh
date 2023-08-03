@@ -85,6 +85,20 @@ runcmd:
 EOF
 chmod a+x ${BOOT_MNT}/user-data
 
+### CREATE SERVER CMDLINE.TXT
+ROOT_UUID=$(blkid --match-tag PARTUUID ${LOOP_DEV}p2 | grep -oE "[a-f0-9]{8}-[a-f0-9]{2}")
+cat - > ${BOOT_MNT}/cmdline.txt << EOF
+console=serial0,115200 console=tty1 root=PARTUUID=${ROOT_UUID} rootfstype=ext4 fsck.repair=yes rootwait quiet init=/usr/lib/raspi-config/init_resize.sh cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+EOF
+chmod a+x ${BOOT_MNT}/cmdline.txt
+
+### DISABLE BLUETOOTH AND WIFI
+cat - >> ${BOOT_MNT}/config.txt << EOF
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+EOF
+chmod a+x ${BOOT_MNT}/config.txt
+
 ### FINISHED WITH BOOT MOUNT
 umount ${BOOT_MNT}
 

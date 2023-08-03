@@ -48,12 +48,6 @@ ssh_authorized_keys:
   - ${SSH_AUTH_KEY}
 EOF
 
-#add required arguments to kernel
-sed -i '$s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/' /boot/cmdline.txt
-
-#disable wifi and bluetooth
-sed -i '$s/$/ \ndtoverlay=disable-wifi\n\dtoverlay=disable-bt/' /boot/config.txt
-
 #CREATE COMMON BOOT FILES
 cat - > /boot/ssh << EOF
 EOF
