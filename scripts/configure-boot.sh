@@ -9,6 +9,11 @@ mkdir -p ${BOOT_MNT}
 mount ${LOOP_DEV}p1 ${BOOT_MNT}
 
 ### SET UP SERVER BOOT CONFIG
+DNS_STR="${LC_PRIMARY_DNS}"
+if [ ${LC_SECONDARY_DNS} ]; then
+  DNS_STR="${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}"
+fi
+
 cat - > ${BOOT_MNT}/network-config << EOF
 version: 2
 ethernets:
@@ -19,7 +24,7 @@ ethernets:
     gateway4: ${LC_EXTERNAL_GW}
     nameservers:
       search: [${LC_EXTERNAL_DOMAIN}]
-      addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
+      addresses: [${DNS_STR}]
   ${LC_INTERNAL_DEVICE}:
     dhcp4: false
     gateway4: ${LC_EXTERNAL_IP}
@@ -27,7 +32,7 @@ ethernets:
     - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
     nameservers:
       search: [${LC_INTERNAL_DOMAIN}]
-      addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
+      addresses: [${DNS_STR}]
 EOF
 chmod a+x ${BOOT_MNT}/network-config
 
@@ -42,7 +47,7 @@ network:
       gateway4: ${LC_EXTERNAL_GW}
       nameservers:
         search: [${LC_EXTERNAL_DOMAIN}]
-        addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
+        addresses: [${DNS_STR}]
     ${LC_INTERNAL_DEVICE}:
       dhcp4: false
       gateway4: ${LC_EXTERNAL_IP}
@@ -50,7 +55,7 @@ network:
       - ${LC_INTERNAL_IP}/${INTERNAL_MASK}
       nameservers:
         search: [${LC_INTERNAL_DOMAIN}]
-        addresses: [${LC_PRIMARY_DNS}, ${LC_SECONDARY_DNS}]
+        addresses: [${DNS_STR}]
 EOF
 chmod a+x ${BOOT_MNT}/meta-data
 
@@ -76,8 +81,6 @@ packages:
   - cloud-init
 users:
   - default
-bootcmd:
-  - mkdir -p /var/lib/minecraft-data/
 runcmd:
   - sh /usr/local/bin/finalize-cloud-init.sh
 EOF

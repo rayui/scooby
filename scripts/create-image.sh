@@ -1,6 +1,9 @@
 #!/bin/sh
 
-. ./config
+. ./scripts/defaults
+
+CONFIG=./config
+[ -f "${CONFIG}" ] && . ${CONFIG}
 
 VAGRANT_IMAGE=./images/scooby.img
 

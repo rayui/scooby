@@ -1,13 +1,17 @@
 #!/bin/sh
 
-. ./config
+. ./scripts/defaults
 . ./scripts/resize-image.sh
 . ./scripts/configure-boot.sh
 . ./scripts/configure-root.sh
 . ./scripts/configure-agent.sh
 
+CONFIG=./config
+[ -f "${CONFIG}" ] && . ${CONFIG}
+
 VAGRANT=/vagrant
 VAGRANT_IMAGE=${VAGRANT}/images/scooby.img
+SERVER_DIR=${VAGRANT}/server
 AGENT_DIR=${VAGRANT}/agents
 
 LOOP_DEV=/dev/loop0

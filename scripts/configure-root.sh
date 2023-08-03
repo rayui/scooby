@@ -6,18 +6,15 @@ INTERNAL_NET=$(printf "${LC_INTERNAL_NET}" | awk -F/ '{print $1}')
 mkdir -p ${ROOT_MNT}
 mount ${LOOP_DEV}p2 ${ROOT_MNT}
 
-### AGENT CONFIG
-mkdir -p ${ROOT_MNT}${CONFIG_DIR}
-
-#CREATE TFTPBOOT DIRECTORY
-mkdir -p ${ROOT_MNT}/tftpboot
-
 #PUT BOOTCODE.BIN IN TFTPBOOT
+mkdir -p ${ROOT_MNT}/tftpboot
 rsync -xa --stats ${ROOT_MNT}${BASE_DIR}/boot/bootcode.bin ${ROOT_MNT}/tftpboot/
 
 ### COPY STATIC CONFIG
-rsync -xa --stats -r ${VAGRANT}/server/* ${ROOT_MNT}
-printf "COPIED STATIC CONFIG\n"
+if [ -f ${SERVER_DIR} ] && [ $(find ${SERVER_DIR} -type f,d) ]; then
+  rsync -xa --stats -r ${SERVER_DIR}/* ${ROOT_MNT}
+  printf "COPIED STATIC CONFIG\n"
+fi
 
 ### BASE SERVICES CONFIG
 ## INTERNAL DNSMASQ
@@ -30,6 +27,7 @@ expand-hosts
 log-dhcp
 EOF
 
+mkdir -p ${ROOT_MNT}/etc/dnsmasq.d
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/10-scooby-dhcp.conf << EOF
 domain=${LC_INTERNAL_DOMAIN}
 interface=${LC_INTERNAL_DEVICE}
@@ -129,14 +127,16 @@ ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
 cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub >> /home/${LC_DEFAULT_USER}/.ssh/authorized_keys
 chown -R ${LC_DEFAULT_USER}:${LC_DEFAULT_USER} /home/${LC_DEFAULT_USER}/.ssh/
 
-for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
-do
-  ### COPY AGENT KEYS FOR K3S
-  mkdir -p ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/
-  rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
-  rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
-  cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/authorized_keys
-done
+if [ -f ${CONFIG_DIR} ] && [ \$(find ${CONFIG_DIR} -type d) ]; then
+  for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
+  do
+    ### COPY AGENT KEYS FOR K3S
+    mkdir -p ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/
+    rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+    rsync -xa --stats /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub ${CONFIG_DIR}/\${AGENT}${SSH_DIR}
+    cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub > ${CONFIG_DIR}/\${AGENT}${SSH_DIR}/authorized_keys
+  done
+fi
 
 #K3S
 cd /tmp && curl -sLS https://get.k3sup.dev | sh
@@ -151,11 +151,6 @@ wall "BUFFY WILL PATROL TONIGHT"
 EOF
 chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
 
-
-
 umount ${ROOT_MNT}
 
 }
-
-
-

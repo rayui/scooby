@@ -23,20 +23,20 @@ jobs:
           LC_DEFAULT_USER: ${{secrets.LC_DEFAULT_USER}}
           LC_PACKER_GITHUB_API_TOKEN: ${{secrets.PACKER_GITHUB_API_TOKEN}}
           LC_SSH_AUTH_KEY: ${{secrets.SSH_AUTH_KEY}}
+          LC_IMAGE_HREF: ${{vars.LC_IMAGE_HREF}}
+          LC_IMAGE_SHA: ${{vars.LC_IMAGE_SHA}}
+          LC_HOSTNAME: ${{vars.LC_HOSTNAME}}
+          LC_PRIMARY_DNS: ${{vars.LC_PRIMARY_DNS}}
+          LC_SECONDARY_DNS: ${{vars.LC_SECONDARY_DNS}}
+          LC_EXTERNAL_DEVICE: ${{vars.LC_EXTERNAL_DEVICE}}
           LC_EXTERNAL_IP: ${{vars.LC_EXTERNAL_IP}}
           LC_EXTERNAL_NET: ${{vars.LC_EXTERNAL_NET}}
           LC_EXTERNAL_GW: ${{vars.LC_EXTERNAL_GW}}
           LC_EXTERNAL_DOMAIN: ${{vars.LC_EXTERNAL_DOMAIN}}
-          LC_PRIMARY_DNS: ${{vars.LC_PRIMARY_DNS}}
-          LC_EXTERNAL_DEVICE: ${{vars.LC_EXTERNAL_DEVICE}}
-          LC_HOSTNAME: ${{vars.LC_HOSTNAME}}
-          LC_IMAGE_HREF: ${{vars.LC_IMAGE_HREF}}
-          LC_IMAGE_SHA: ${{vars.LC_IMAGE_SHA}}
           LC_INTERNAL_DEVICE: ${{vars.LC_INTERNAL_DEVICE}}
           LC_INTERNAL_IP: ${{vars.LC_INTERNAL_IP}}
           LC_INTERNAL_NET: ${{vars.LC_INTERNAL_NET}}
           LC_INTERNAL_DOMAIN: ${{vars.LC_INTERNAL_DOMAIN}}
-          LC_SECONDARY_DNS: ${{vars.LC_SECONDARY_DNS}}
       - name: Upload server image to S3
         if: ${{secrets.AWS_BUCKET_S3_URI}} && ${{ secrets.AWS_KEY_ID }} && ${{secrets.AWS_SECRET_ACCESS_KEY}} && ${{secrets.AWS_REGION}}
         id: create_server_href
