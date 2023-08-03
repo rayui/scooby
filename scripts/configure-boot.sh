@@ -65,7 +65,6 @@ cat - > ${BOOT_MNT}/user-data << EOF
 hostname: ${LC_HOSTNAME}
 manage_etc_hosts: false
 packages:
-  - vim
   - libarchive-tools
   - git
   - curl
