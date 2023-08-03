@@ -65,6 +65,13 @@ dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 ip=dhcp root=/dev/nfs n
 EOF
 chmod a+x ${AGENT_ROOT}/boot/cmdline.txt
 
+### DISABLE BLUETOOTH AND WIFI
+cat - >> ${AGENT_ROOT}/boot/config.txt << EOF
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+EOF
+chmod a+x ${AGENT_ROOT}/boot/config.txt
+
 ### CREATE AGENT USER-DATA
 cat - > ${AGENT_ROOT}/boot/user-data << EOF
 #cloud-config
