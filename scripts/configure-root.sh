@@ -87,25 +87,6 @@ kube-scheduler-arg:
 etcd-expose-metrics: true
 EOF
 
-## EXTERNAL AVAHI
-mkdir -p ${ROOT_MNT}/etc/avahi/
-cat - > ${ROOT_MNT}/etc/avahi/avahi-daemon.conf << EOF
-[server]
-use-ipv4=yes
-use-ipv6=yes
-#only allow on public interface
-allow-interfaces=${LC_EXTERNAL_DEVICE}
-ratelimit-interval-usec=1000000
-ratelimit-burst=1000
-
-[wide-area]
-enable-wide-area=yes
-
-[publish]
-publish-hinfo=no
-publish-workstation=no
-EOF
-
 ### HOSTS
 cat - >> ${ROOT_MNT}/etc/hosts << EOF
   ${LC_INTERNAL_IP} ${LC_HOSTNAME}
