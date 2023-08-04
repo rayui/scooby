@@ -38,7 +38,7 @@ jobs:
           LC_INTERNAL_NET: ${{vars.LC_INTERNAL_NET}}
           LC_INTERNAL_DOMAIN: ${{vars.LC_INTERNAL_DOMAIN}}
       - name: Upload server image to S3
-        if: ${{ env.AWS_BUCKET_S3_URI }} != '' && ${{ env.AWS_KEY_ID }} != '' && ${{ env.AWS_SECRET_ACCESS_KEY }} != '' && ${{ env.AWS_REGION }} != ''
+        if: ${{ env.AWS_BUCKET_S3_URI != '' env.AWS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && env.AWS_REGION }} != '' }}
         id: create_server_href
         run: aws s3 cp ./scooby.img ${{ env.AWS_BUCKET_S3_URI }}/scooby-latest-arm64.img
         working-directory: images
