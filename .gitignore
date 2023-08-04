@@ -2,3 +2,4 @@ images/
 .vagrant/
 .env
 .notes/
+.vscode/
