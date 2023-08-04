@@ -1,0 +1,12 @@
+name: branch
+on:
+  push:
+    branches:
+      - "issue-*"
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    secrets:
+      default_user: ${{ secrets.LC_DEFAULT_USER }}
+      packer_token: ${{ secrets.LC_PACKER_GITHUB_API_TOKEN }}
+      ssh_key: ${{ secrets.LC_SSH_AUTH_KEY }}
