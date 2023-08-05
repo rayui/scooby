@@ -107,7 +107,7 @@ Kubernetes manifests should go in `/server/var/lib/rancher/k3s/server/manifests`
 
 ## Agent config
 
-On build, the server configuration step will create one agent instance for each directory in `/server/etc/scooby/agents/{hostname}`. Agents are described in the `agents` folder in the project root. Create one file for each agent node. The name of the file is the hostname of the agent node. The required variables are:
+On build, the server configuration step will create one agent instance for each directory in `/server/etc/scooby/agents/{hostname}.agent`. Agents are described in the `agents` folder in the project root. Create one file for each agent node. The name of the file is the hostname of the agent node. The required variables are:
 
 `AGENT_ETHERNET`, `AGENT_IP`, `AGENT_RANCHER_PART_UUID`, `AGENT_PXE_ID`
 
@@ -115,7 +115,8 @@ An optional variable, `AGENT_K3S_ARGS`, allows you to provide extra arguments to
 
 An example agent description file might look like the following:
 
-```AGENT_ETHERNET=b8:27:eb:81:1a:52
+```
+AGENT_ETHERNET=b8:27:eb:81:1a:52
 AGENT_IP=192.168.64.65
 AGENT_RANCHER_PART_UUID=d5f9e6c2-493c-48da-baf2-0c63dd7a36b1
 AGENT_PXE_ID=c6811a52
