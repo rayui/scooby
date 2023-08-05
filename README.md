@@ -96,8 +96,11 @@ If you have the AWS secrets set, GHA will attempt to upload your image to an S3 
 
 ### Runners
 
+For convenience, Scooby is configured to use GHA's runners by default. It is configured to use macos-latest.
+This is the only GitHub runner that currently provides Vagrant, which is a build requirement.
+
 A self-hosted runner is recommended if you plan to make frequent changes.
-If you wish to use Github's own runners, you will need to edit `./github/workflows/build.yml` and change `runs-on` to `macos-latest`.
+If you wish to do so and have already set up your self-hosted runner, you will need to edit `./github/workflows/build.yml` and `./github/workflows/main.yml`, and change `runs-on: macos-latest` to `runs-on: self-hosted`.
 
 ## Server config
 
