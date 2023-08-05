@@ -5,6 +5,8 @@ VARS="./.env"
 #load local variables if available
 [ -f "${VARS}" ] && . ${VARS}
 
+. ./scripts/banner.sh
+
 vagrant box update
 vagrant plugin install vagrant-vbguest
 vagrant up
