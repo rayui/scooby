@@ -155,9 +155,9 @@ configureAgents() {
   
   if [ -f ${AGENT_DIR} ] && [ $(find ${AGENT_DIR} -type f) ]; then
     FSID=1
-    for AGENT in ${AGENT_DIR}/*
+    for FILE in ${AGENT_DIR}/*.agent
     do
-      configureAgent "${AGENT}"
+      configureAgent $(printf "${FILE}" | grep -oE "^[a-z0-9\-]+")
       FSID=$((FSID+1))
     done
   fi
