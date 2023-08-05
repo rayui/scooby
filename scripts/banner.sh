@@ -1,6 +1,6 @@
-. ./scripts/defaults
+. $(pwd)/scripts/defaults
 
-CONFIG=./config
+CONFIG=$(pwd)/config
 [ -f "${CONFIG}" ] && . ${CONFIG}
 
 cat << EOF
@@ -31,3 +31,12 @@ LC_IMAGE_HREF=${LC_IMAGE_HREF}
 LC_IMAGE_SHA=${LC_IMAGE_SHA}
 
 EOF
+
+AGENT_DIR=$(pwd)/agents
+if [ -d ${AGENT_DIR} ] && [ -f ${AGENT_DIR}/*.agent ]; then
+  for FILE in $(cd ${AGENT_DIR}; ls *.agent)
+  do
+    printf "${FILE}\n"
+    cat ${AGENT_DIR}/${FILE}
+  done
+fi

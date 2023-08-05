@@ -153,9 +153,9 @@ configureAgents() {
   ### AGENT CONFIG
   mkdir -p ${ROOT_MNT}${CONFIG_DIR}
   
-  if [ -f ${AGENT_DIR} ] && [ $(find ${AGENT_DIR} -type f) ]; then
+  if [ -d ${AGENT_DIR} ] && [ -f ${AGENT_DIR}/*.agent ]; then
     FSID=1
-    for FILE in ${AGENT_DIR}/*.agent
+    for FILE in $(cd ${AGENT_DIR}; ls *.agent)
     do
       configureAgent $(printf "${FILE}" | grep -oE "^[a-z0-9\-]+")
       FSID=$((FSID+1))
