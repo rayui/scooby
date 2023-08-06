@@ -11,7 +11,7 @@ on:
         required: true
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: macos-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3

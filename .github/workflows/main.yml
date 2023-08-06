@@ -11,7 +11,7 @@ jobs:
       packer_token: ${{ secrets.LC_PACKER_GITHUB_API_TOKEN }}
       ssh_key: ${{ secrets.LC_SSH_AUTH_KEY }}
   deploy:
-    runs-on: self-hosted
+    runs-on: macos-latest
     needs: [build]
     steps:
       - name: Upload server image to S3
