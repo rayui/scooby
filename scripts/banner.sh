@@ -29,14 +29,14 @@ LC_INTERNAL_DEVICE=${LC_INTERNAL_DEVICE}
 LC_INTERNAL_DOMAIN=${LC_INTERNAL_DOMAIN}
 LC_IMAGE_HREF=${LC_IMAGE_HREF}
 LC_IMAGE_SHA=${LC_IMAGE_SHA}
-
 EOF
 
 AGENT_DIR=$(pwd)/agents
-if [ -d ${AGENT_DIR} ] && [ -f ${AGENT_DIR}/*.agent ]; then
+if [ -d ${AGENT_DIR} ] && ls ${AGENT_DIR}/*.agent 1> /dev/null 2>&1; then
   for FILE in $(cd ${AGENT_DIR}; ls *.agent)
   do
-    printf "${FILE}\n"
+    printf "\n${FILE}\n"
     cat ${AGENT_DIR}/${FILE}
+    printf "\n"
   done
 fi
