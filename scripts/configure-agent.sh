@@ -28,11 +28,9 @@ SSH_DIR=${SCOOBY_DIR}/ssh
 MOUNT_DIR=/mnt/scooby/agents
 RANCHERSTORAGEPATH=/var/lib/rancher
 
-. ${AGENT_DIR}/${AGENT}
-
 AGENT_ROOT=${ROOT_MNT}${CONFIG_DIR}/${AGENT}
 
-printf "CONFIGURING AGENT ${AGENT}\n"
+printf "\nCONFIGURING AGENT ${AGENT}\n"
 
 ### AGENT HOST ENTRY
 cat - >> ${ROOT_MNT}/etc/hosts << EOF
@@ -153,10 +151,11 @@ configureAgents() {
   ### AGENT CONFIG
   mkdir -p ${ROOT_MNT}${CONFIG_DIR}
   
-  if [ -d ${AGENT_DIR} ] && [ -f ${AGENT_DIR}/*.agent ]; then
+  if [ -d ${AGENT_DIR} ] && ls ${AGENT_DIR}/*.agent 1> /dev/null 2>&1; then
     FSID=1
     for FILE in $(cd ${AGENT_DIR}; ls *.agent)
     do
+      . ${AGENT_DIR}/${FILE}
       configureAgent $(printf "${FILE}" | grep -oE "^[a-z0-9\-]+")
       FSID=$((FSID+1))
     done

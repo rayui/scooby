@@ -108,7 +108,7 @@ ssh-keygen -q -f /home/${LC_DEFAULT_USER}/.ssh/id_ed25519 -N "" -t ed25519
 cat /home/${LC_DEFAULT_USER}/.ssh/id_ed25519.pub >> /home/${LC_DEFAULT_USER}/.ssh/authorized_keys
 chown -R ${LC_DEFAULT_USER}:${LC_DEFAULT_USER} /home/${LC_DEFAULT_USER}/.ssh/
 
-if [ -f ${CONFIG_DIR} ] && [ \$(find ${CONFIG_DIR} -type d) ]; then
+if [ -d ${CONFIG_DIR} ] && ls -d ${CONFIG_DIR}/* 1> /dev/null 2>&1; then
   for AGENT in \$(cd ${CONFIG_DIR}; ls -d *)
   do
     ### COPY AGENT KEYS FOR K3S
