@@ -11,7 +11,7 @@ mkdir -p ${ROOT_MNT}/tftpboot
 rsync -xa --stats ${ROOT_MNT}${BASE_DIR}/boot/bootcode.bin ${ROOT_MNT}/tftpboot/
 
 ### COPY STATIC CONFIG
-if [ -f ${SERVER_DIR} ] && [ $(find ${SERVER_DIR} -type f,d) ]; then
+if [ -f ${SERVER_DIR} ] && ls ${SERVER_DIR}/* 1> /dev/null 2>&1; then
   rsync -xa --stats -r ${SERVER_DIR}/* ${ROOT_MNT}
   printf "COPIED STATIC CONFIG\n"
 fi
