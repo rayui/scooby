@@ -19,7 +19,7 @@ jobs:
       - name: Upload server image to S3
         if: env.AWS_ACCESS_KEY_ID != null && env.AWS_SECRET_ACCESS_KEY != null && env.AWS_REGION != null && env.AWS_BUCKET_S3_URI != null
         id: create_server_href
-        run: aws s3 cp ./scooby.img ${{ env.AWS_BUCKET_S3_URI }}scooby-latest-arm64.img
+        run: aws s3 cp * ${{ env.AWS_BUCKET_S3_URI }}
         working-directory: images
         env:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
