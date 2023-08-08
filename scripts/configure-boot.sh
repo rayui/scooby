@@ -92,13 +92,6 @@ console=serial0,115200 console=tty1 root=PARTUUID=${ROOT_UUID} rootfstype=ext4 f
 EOF
 chmod a+x ${BOOT_MNT}/cmdline.txt
 
-### DISABLE BLUETOOTH AND WIFI
-cat - >> ${BOOT_MNT}/config.txt << EOF
-dtoverlay=disable-wifi
-dtoverlay=disable-bt
-EOF
-chmod a+x ${BOOT_MNT}/config.txt
-
 ### FINISHED WITH BOOT MOUNT
 umount ${BOOT_MNT}
 
