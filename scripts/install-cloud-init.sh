@@ -66,5 +66,12 @@ network:
 EOF
 chmod a+x /boot/meta-data
 
+### DISABLE BLUETOOTH AND WIFI
+cat - >> /boot/config.txt << EOF
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+EOF
+chmod a+x /boot/config.txt
+
 # Disable dhcpcd - it has a conflict with cloud-init network config
 systemctl mask dhcpcd
