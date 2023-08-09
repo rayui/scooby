@@ -11,7 +11,7 @@ jobs:
       packer_token: ${{ secrets.LC_PACKER_GITHUB_API_TOKEN }}
       ssh_key: ${{ secrets.LC_SSH_AUTH_KEY }}
   deploy:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: [build]
     steps:
       - name: Restore image

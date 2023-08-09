@@ -128,7 +128,7 @@ mkdir -p /root/.kube
 rsync -xa --stats ./kubeconfig /root/.kube/config
 
 #READY
-wall "BUFFY WILL PATROL TONIGHT"
+wall "${LC_HOSTNAME} WILL PATROL TONIGHT"
 EOF
 chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
 
