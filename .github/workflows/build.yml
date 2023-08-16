@@ -1,0 +1,37 @@
+name: build
+
+on:
+  workflow_call:
+    secrets:
+      default_user:
+        required: true
+      packer_token:
+        required: true
+      ssh_key:
+        required: true
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
+      - name: Build
+        run: ./scripts/build.sh
+        env:
+          LC_ALL: en_US.UTF-8
+          LC_DEFAULT_USER: ${{secrets.default_user}}
+          LC_PACKER_GITHUB_API_TOKEN: ${{secrets.packer_token}}
+          LC_SSH_AUTH_KEY: ${{secrets.ssh_key}}
+      - name: Store Image
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: images
+          path: ./images/
