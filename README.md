@@ -53,7 +53,7 @@ The master node in any Scooby cluster of more than one node has two physical eth
 
 The `internal` network is the physical network on which the master and agent nodes communicate, and to which the `eth1` device of the master node is physically connected.
 
-The `external` network is a separate pyhsical subnet with access to the Internet to which the `eth0` device of the master node is pyhsically connected.
+The `external` network is a separate physical network with access to the Internet, and to which the `eth0` device of the master node is physically connected.
 
 All agent nodes' `eth0` devices are connected to the `internal` network.
 
@@ -83,9 +83,9 @@ LC_EXTERNAL_GW=192.168.1.1
 LC_EXTERNAL_DOMAIN=
 
 # Master node cluster network configuration
+LC_INTERNAL_DEVICE=eth1
 LC_INTERNAL_IP=192.168.64.1
 LC_INTERNAL_NET=192.168.64.0/24
-LC_INTERNAL_DEVICE=eth1
 LC_INTERNAL_DOMAIN=sunnydale
 ```
 
@@ -119,9 +119,9 @@ Create one file for each of the agent nodes in the `./agents` directory. This fi
 For each agent, you will need to provide:
 
 - the agent node's hardware address
-- it's IPv4 address
+- its IPv4 address
 - a UUID for a partition containing an ext4 filesystem for `K3S` persistent local storage
-- the Pi's PXE client ID
+- its PXE client ID
 - any extra args for K3s that the agent might need (optional)
 
 For example:
@@ -400,7 +400,7 @@ You might find that Scooby's dnsmasq instance is an easier solution for serving 
 `/server/etc/dnsmasq.d/10-external-dhcp.conf`
 
 ```
-domain=socal,192.168.1.0/24
+domain=magicbox,192.168.1.0/24
 interface=eth0
 
 dhcp-range=tag:eth0,192.168.1.128,192.168.1.240
