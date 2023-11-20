@@ -121,6 +121,7 @@ For each agent, you will need to provide:
 - the agent node's hardware address
 - its IPv4 address
 - a UUID for a partition containing an ext4 filesystem for `K3S` persistent local storage
+- an optional UUID for a swap partition
 - its PXE client ID
 - any extra args for K3s that the agent might need (optional)
 

@@ -108,6 +108,12 @@ ${LC_INTERNAL_IP}:${MOUNT_DIR}/${AGENT} / nfs defaults 0 0
 UUID="${AGENT_RANCHER_PART_UUID}" ${RANCHERSTORAGEPATH} ext4 defaults 0 0
 EOF
 
+if [ ! -z ${AGENT_SWAP_PART_UUID} ]; then
+  cat - >> ${AGENT_ROOT}/etc/fstab << EOF
+UUID="${AGENT_SWAP_PART_UUID}" none swap sw 0 0
+EOF
+fi
+
 ### CREATE AGENT DNSMASQ ENTRY
 cat - > ${ROOT_MNT}/etc/dnsmasq.d/20-scooby-agent-${AGENT} << EOF
 dhcp-host=net:${AGENT},${AGENT_ETHERNET},${AGENT},${AGENT_IP},24h
@@ -148,6 +154,7 @@ configureAgents() {
     FSID=1
     for FILE in $(cd ${AGENT_DIR}; ls *.agent)
     do
+      AGENT_SWAP_PART_UUID=""
       . ${AGENT_DIR}/${FILE}
       configureAgent $(printf "${FILE}" | grep -oE "^[a-z0-9\-]+")
       FSID=$((FSID+1))
