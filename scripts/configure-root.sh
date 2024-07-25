@@ -130,7 +130,31 @@ rsync -xa --stats ./kubeconfig /root/.kube/config
 #READY
 wall "${LC_HOSTNAME} WILL PATROL TONIGHT"
 EOF
-chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh  
+chmod a+x ${ROOT_MNT}/usr/local/bin/finalize-cloud-init.sh
+
+#RESET AGENT SCRIPT
+
+cat - >> /usr/local/bin/reset_agent.sh << EOF
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  printf "You must supply the name of an agent\n"
+  exit 1
+fi
+
+if ! [ -f /var/lib/scooby/agents/$1 ]; then
+  printf "Agent does not exist\n"
+  exit 1 
+fi
+
+exportfs -u $1:/mnt/scooby/agents/$1
+umount /mnt/scooby/agents/$1
+rm -rf /var/lib/scooby/agents/$1/*
+rm -rf /var/lib/scooby/overlay/$1/*
+mount -a
+exportfs -a
+EOF
+chmod a+x ${ROOT_MNT}/usr/local/bin/reset-agent.sh
 
 umount ${ROOT_MNT}
 
